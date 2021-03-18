@@ -1,12 +1,10 @@
 #!/usr/bin/env python3
 
 class Table:
-    def __init__(self):
+    def __init__(self, cell_info):
         self.cell_data = [[]]
 
-        self.cell_height = 3
-        self.cell_width = 4
-        self.cell_has_border = True
+        self.cell_info = cell_info
 
     def draw_table(self):
         table = ""
@@ -15,10 +13,10 @@ class Table:
 
         for result in self.draw_table_iter():
             idx += 1
-            if idx == self.cell_height and row < len(self.cell_data):
+            if idx == self.cell_info.height and row < len(self.cell_data):
                 row += 1
                 idx = 0
-                if self.cell_has_border:
+                if self.cell_info.has_border:
                     continue
 
             table += result + '\n'
@@ -33,15 +31,15 @@ class Table:
         return '\n'.join(self.draw_row_iter(row))
 
     def draw_row_iter(self, row):
-        gen_list = [ self.draw_cell_iter(row[i]) for i in range(len(row)) ]
+        gen_list = [ self.draw_cell(row[i]) for i in range(len(row)) ]
 
-        for _ in range(self.cell_height):
+        for _ in range(self.cell_info.height):
             chars = ''
             first = True
 
             for gen in gen_list:
                 res = next(gen)
-                if not first and self.cell_has_border:
+                if not first and self.cell_info.has_border:
                     chars += res[1:]
                 else:
                     chars += res
@@ -49,19 +47,31 @@ class Table:
                 first = False
             yield chars
 
-    def draw_cell_iter(self, val):
-        yield '+--+'
-        yield '|%s|' % self.getval(val)
-        yield '+--+'
-        #yield self.getval(val)
+    def draw_cell(self, val):
+        for res in self.cell_info.fnc_draw_cell(self.cell_info.fnc_getval(val)):
+            yield res
 
-    def getval(self, val):
-        if val == 0:
-            return '  '
-        return '\x1b[42m  \x1b[0m'
+class CellInfo:
+    def __init__(self, **kwargs):
+        self.width = kwargs['width']
+        self.height = kwargs['height']
+        self.has_border = kwargs['has_border']
+
+        self.fnc_draw_cell = kwargs['drawcell']
+        self.fnc_getval = kwargs.get('getval', lambda x: x)
 
 
-tbl = Table()
+def draw_cell(val):
+    yield '+--+'
+    yield '|%s|' % val
+    yield '+--+'
+
+def getval(val):
+    if val == 0:
+        return '  '
+    return '\x1b[42m  \x1b[0m'
+
+tbl = Table(CellInfo(width=4, height=3, has_border=True, drawcell=draw_cell, getval=getval))
 tbl.cell_data = [
     [1, 0, 1, 1],
     [1, 1, 0, 0],
