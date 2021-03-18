@@ -61,17 +61,35 @@ class CellInfo:
         self.fnc_getval = kwargs.get('getval', lambda x: x)
 
 
-def draw_cell(val):
+def draw_cell_bordered(val):
     yield '+--+'
     yield '|%s|' % val
     yield '+--+'
+
+def draw_cell_unborder(val):
+    yield val
 
 def getval(val):
     if val == 0:
         return '  '
     return '\x1b[42m  \x1b[0m'
 
-tbl = Table(CellInfo(width=4, height=3, has_border=True, drawcell=draw_cell, getval=getval))
+cell_bordered = CellInfo(
+    width=4,
+    height=3,
+    has_border=True,
+    drawcell=draw_cell_bordered,
+    getval=getval
+)
+cell_unborder = CellInfo(
+    width=2,
+    height=1,
+    has_border=False,
+    drawcell=draw_cell_unborder,
+    getval=getval
+)
+
+tbl = Table(cell_unborder)
 tbl.cell_data = [
     [1, 0, 1, 1],
     [1, 1, 0, 0],
