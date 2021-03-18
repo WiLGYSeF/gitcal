@@ -2,18 +2,21 @@
 
 class Table:
     def __init__(self, cell_info):
-        self.cell_data = [[]]
-
+        self.data = [[]]
         self.cell_info = cell_info
 
+    def set_table_data(self, data):
+        self.data = data
+
     def draw_table(self):
+        row_count = len(self.data)
         table = ""
         idx = 0
         row = 1
 
         for result in self.draw_table_iter():
             idx += 1
-            if idx == self.cell_info.height and row < len(self.cell_data):
+            if idx == self.cell_info.height and row < row_count:
                 row += 1
                 idx = 0
                 if self.cell_info.has_border:
@@ -23,15 +26,15 @@ class Table:
         return table
 
     def draw_table_iter(self):
-        for row in range(len(self.cell_data)):
-            for char_row in self.draw_row_iter(self.cell_data[row]):
+        for row in self.data:
+            for char_row in self.draw_row_iter(row):
                 yield char_row
 
     def draw_row(self, row):
         return '\n'.join(self.draw_row_iter(row))
 
     def draw_row_iter(self, row):
-        gen_list = [ self.draw_cell(row[i]) for i in range(len(row)) ]
+        gen_list = [ self.draw_cell_iter(row[i]) for i in range(len(row)) ]
 
         for _ in range(self.cell_info.height):
             chars = ''
@@ -47,7 +50,7 @@ class Table:
                 first = False
             yield chars
 
-    def draw_cell(self, val):
+    def draw_cell_iter(self, val):
         for res in self.cell_info.fnc_draw_cell(self.cell_info.fnc_getval(val)):
             yield res
 
@@ -91,11 +94,11 @@ def main():
     )
 
     tbl = Table(cell_unborder)
-    tbl.cell_data = [
+    tbl.set_table_data([
         [1, 0, 1, 1],
         [1, 1, 0, 0],
         [1, 0, 1, 0]
-    ]
+    ])
     print(tbl.draw_table(), end='')
 
 if __name__ == '__main__':
