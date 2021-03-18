@@ -74,25 +74,29 @@ def getval(val):
         return '  '
     return '\x1b[42m  \x1b[0m'
 
-cell_bordered = CellInfo(
-    width=4,
-    height=3,
-    has_border=True,
-    drawcell=draw_cell_bordered,
-    getval=getval
-)
-cell_unborder = CellInfo(
-    width=2,
-    height=1,
-    has_border=False,
-    drawcell=draw_cell_unborder,
-    getval=getval
-)
+def main():
+    cell_bordered = CellInfo(
+        width=4,
+        height=3,
+        has_border=True,
+        drawcell=draw_cell_bordered,
+        getval=getval
+    )
+    cell_unborder = CellInfo(
+        width=2,
+        height=1,
+        has_border=False,
+        drawcell=draw_cell_unborder,
+        getval=getval
+    )
 
-tbl = Table(cell_unborder)
-tbl.cell_data = [
-    [1, 0, 1, 1],
-    [1, 1, 0, 0],
-    [1, 0, 1, 0]
-]
-print(tbl.draw_table(), end='')
+    tbl = Table(cell_unborder)
+    tbl.cell_data = [
+        [1, 0, 1, 1],
+        [1, 1, 0, 0],
+        [1, 0, 1, 0]
+    ]
+    print(tbl.draw_table(), end='')
+
+if __name__ == '__main__':
+    main()
