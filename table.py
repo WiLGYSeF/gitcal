@@ -29,6 +29,7 @@ class Table:
 
         has_labels = len(self.row_labels) != 0
         longest_label = -1
+        did_label = False
 
         val_list = self.row_labels
         if isinstance(self.row_labels, dict):
@@ -38,21 +39,30 @@ class Table:
             if len(val) > longest_label:
                 longest_label = len(val)
 
+        first_line = True
+
         for _ in range(self.cell_info.height):
             chars = ''
-            first = True
+            first_col = True
 
             for gen in gen_list:
                 res = next(gen)
-                if not first and self.cell_info.has_border:
+                if not first_col and self.cell_info.has_border:
                     chars += res[1:]
                 else:
                     chars += res
 
-                first = False
+                first_col = False
 
             if row_idx != -1 and has_labels:
-                label = self.get_row_label(row_idx)
+                label = self.get_row_label(row_idx) if not did_label else ''
+
+                if not did_label and self.cell_info.has_border and first_line:
+                    label = ''
+                    did_label = False
+                else:
+                    did_label = True
+
                 if label is None:
                     label = ''
 
@@ -65,7 +75,9 @@ class Table:
                     chars = '%s%s%s' % (label, self.label_sep, chars)
                 else:
                     chars += self.label_sep + label
+
             yield chars
+            first_line = False
 
     def draw_cell_iter(self, val):
         for res in self.cell_info.fnc_draw_cell(self.cell_info.fnc_getval(val)):
