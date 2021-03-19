@@ -13,8 +13,11 @@ def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=N
         filter_names = [ filter_names ]
 
     tbl = Table(cell_info)
+    tbl.left_label = True
+
     data = []
     row = []
+    labels = []
     counter = 0
 
     col_count = 7
@@ -28,6 +31,8 @@ def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=N
         if len(row) == col_count:
             data.append(row)
             row = []
+
+            labels.append(str(curdate))
 
         row.append(val)
 
@@ -57,6 +62,9 @@ def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=N
 
     print(data)
     tbl.set_table_data(data)
+
+    tbl.row_labels = labels
+
     return tbl
 
 def get_commit_data():
