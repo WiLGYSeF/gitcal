@@ -3,6 +3,8 @@ class Table:
         self.data = [[]]
         self.cell_info = cell_info
 
+        self.row_labels = {}
+
     def set_table_data(self, data):
         self.data = data
 
@@ -23,14 +25,16 @@ class Table:
         return table
 
     def draw_table_iter(self):
+        row_idx = 0
         for row in self.data:
-            for char_row in self.draw_row_iter(row):
+            for char_row in self.draw_row_iter(row, row_idx):
                 yield char_row
+            row_idx += 1
 
-    def draw_row(self, row):
-        return '\n'.join(self.draw_row_iter(row))
+    def draw_row(self, row, row_idx=-1):
+        return '\n'.join(self.draw_row_iter(row, row_idx))
 
-    def draw_row_iter(self, row):
+    def draw_row_iter(self, row, row_idx=-1):
         gen_list = [ self.draw_cell_iter(row[i]) for i in range(len(row)) ]
 
         for _ in range(self.cell_info.height):
@@ -45,11 +49,24 @@ class Table:
                     chars += res
 
                 first = False
+
+            if row_idx != -1:
+                label = self.get_row_label(row_idx)
+                if label is not None:
+                    chars += ' ' + label
             yield chars
 
     def draw_cell_iter(self, val):
         for res in self.cell_info.fnc_draw_cell(self.cell_info.fnc_getval(val)):
             yield res
+
+    def get_row_label(self, row_idx):
+        if isinstance(self.row_labels, dict):
+            return self.row_labels.get(row_idx)
+
+        if len(self.row_labels) <= row_idx:
+            return None
+        return self.row_labels[row_idx]
 
     def row_length(self):
         if self.cell_info.has_border:
@@ -91,7 +108,8 @@ class Table:
                                 row_counter[gidx] += 1
                                 lne_counter[gidx] = 0
 
-                                if tbl.cell_info.has_border and tbl.row_count() != row_counter[gidx]:
+                                if tbl.cell_info.has_border \
+                                 and tbl.row_count() != row_counter[gidx]:
                                     do_draw = True
                                     continue
                         except StopIteration:
