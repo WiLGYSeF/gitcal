@@ -6,6 +6,54 @@ import subprocess
 from table import Table, CellInfo
 
 
+def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=None):
+    if timedelta is None:
+        timedelta = datetime.timedelta(days=1)
+    if filter_names is not None and not isinstance(filter_names, list):
+        filter_names = [ filter_names ]
+
+    tbl = Table(cell_info)
+    data = []
+    row = []
+    counter = 0
+
+    first_date = commits[0]['datetime']
+    curdate = datetime.datetime(first_date.year, first_date.month, first_date.day)
+    curdate += timedelta
+
+    def append(val):
+        nonlocal row
+        if len(row) == 7:
+            data.append(row)
+            row = []
+
+        row.append(val)
+
+    for commit in commits:
+        if filter_names is not None and commit['name'] not in filter_names:
+            continue
+
+        print(commit)
+
+        if curdate < commit['datetime']:
+            curdate += timedelta
+            append(counter)
+            counter = 0
+
+            while curdate < commit['datetime']:
+                curdate += timedelta
+                append(0)
+        else:
+            counter += 1
+
+    if counter != 0:
+        row.append(counter)
+    data.append(row)
+
+    print(data)
+    tbl.set_table_data(data)
+    return tbl
+
 def get_commit_data():
     output = subprocess.check_output([
         'git', 'log',
@@ -18,11 +66,15 @@ def get_commit_data():
         line = line.decode('utf-8')
 
         spl = line.split(' ')
-        commit_shorthash = spl[0]
+        shorthash = spl[0]
         dtime = datetime.datetime.strptime(spl[1], '%Y%m%d%H%M%S')
         name = ' '.join(spl[2:])
 
-        commits.append( (commit_shorthash, dtime, name) )
+        commits.append({
+            'shorthash': shorthash,
+            'datetime': dtime,
+            'name': name
+        })
     return commits
 
 def draw_cell_bordered(val):
@@ -53,6 +105,13 @@ def main():
         drawcell=draw_cell_unborder,
         getval=getval
     )
+
+    commits = get_commit_data()
+    commits.reverse()
+
+    tbl = create_table_from_commits(cell_bordered, commits)
+    print(tbl.draw_table())
+    return
 
     tbl = Table(cell_bordered)
     tbl.set_table_data([
