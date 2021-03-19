@@ -17,13 +17,15 @@ def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=N
     row = []
     counter = 0
 
+    col_count = 7
+
     first_date = commits[0]['datetime']
     curdate = datetime.datetime(first_date.year, first_date.month, first_date.day)
     curdate += timedelta
 
     def append(val):
         nonlocal row
-        if len(row) == 7:
+        if len(row) == col_count:
             data.append(row)
             row = []
 
@@ -48,6 +50,9 @@ def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=N
 
     if counter != 0:
         row.append(counter)
+    while len(row) < col_count:
+        row.append(0)
+
     data.append(row)
 
     print(data)
