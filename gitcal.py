@@ -1,7 +1,29 @@
 #!/usr/bin/env python3
 
+import datetime
+import subprocess
+
 from table import Table, CellInfo
 
+
+def get_commit_data():
+    output = subprocess.check_output([
+        'git', 'log',
+        '--pretty=format:%h %ad %an',
+        '--date=format:%Y%m%d%H%M%S'
+    ])
+    commits = []
+
+    for line in output.split(b'\n'):
+        line = line.decode('utf-8')
+
+        spl = line.split(' ')
+        commit_shorthash = spl[0]
+        dtime = datetime.datetime.strptime(spl[1], '%Y%m%d%H%M%S')
+        name = ' '.join(spl[2:])
+
+        commits.append( (commit_shorthash, dtime, name) )
+    return commits
 
 def draw_cell_bordered(val):
     yield '+--+'
