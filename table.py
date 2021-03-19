@@ -5,8 +5,8 @@ class Table:
 
         self.row_labels = {}
         self.label_sep = '  '
+        self.label_lpad = True
         self.left_label = False
-        self.left_label_lpad = True
 
     def set_table_data(self, data):
         self.data = data
@@ -30,14 +30,13 @@ class Table:
         has_labels = len(self.row_labels) != 0
         longest_label = -1
 
-        if self.left_label:
-            val_list = self.row_labels
-            if isinstance(self.row_labels, dict):
-                val_list = self.row_labels.values()
+        val_list = self.row_labels
+        if isinstance(self.row_labels, dict):
+            val_list = self.row_labels.values()
 
-            for val in val_list:
-                if len(val) > longest_label:
-                    longest_label = len(val)
+        for val in val_list:
+            if len(val) > longest_label:
+                longest_label = len(val)
 
         for _ in range(self.cell_info.height):
             chars = ''
@@ -54,18 +53,18 @@ class Table:
 
             if row_idx != -1 and has_labels:
                 label = self.get_row_label(row_idx)
-                if label is not None or self.left_label:
-                    if self.left_label:
-                        if label is None:
-                            label = ''
+                if label is None:
+                    label = ''
 
-                        if self.left_label_lpad:
-                            label = ' '  * (longest_label - len(label)) + label
-                        else:
-                            label += ' '  * (longest_label - len(label))
-                        chars = '%s%s%s' % (label, self.label_sep, chars)
-                    else:
-                        chars += self.label_sep + label
+                if self.label_lpad:
+                    label = ' '  * (longest_label - len(label)) + label
+                else:
+                    label += ' '  * (longest_label - len(label))
+
+                if self.left_label:
+                    chars = '%s%s%s' % (label, self.label_sep, chars)
+                else:
+                    chars += self.label_sep + label
             yield chars
 
     def draw_cell_iter(self, val):
