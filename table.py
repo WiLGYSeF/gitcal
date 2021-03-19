@@ -9,20 +9,7 @@ class Table:
         self.data = data
 
     def draw_table(self):
-        table = ""
-        idx = 0
-        row = 1
-
-        for result in self.draw_table_iter():
-            idx += 1
-            if idx == self.cell_info.height and row < self.row_count():
-                row += 1
-                idx = 0
-                if self.cell_info.has_border:
-                    continue
-
-            table += result + '\n'
-        return table
+        return Table.draw_tables( (self,) )
 
     def draw_table_iter(self):
         row_idx = 0
