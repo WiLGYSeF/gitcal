@@ -53,51 +53,58 @@ class Table:
         for res in self.cell_info.fnc_draw_cell(self.cell_info.fnc_getval(val)):
             yield res
 
+    def row_length(self):
+        if self.cell_info.has_border:
+            return self.col_count() * self.cell_info.width - self.col_count() + 1
+        return self.col_count() * self.cell_info.width
+
     def row_count(self):
         return len(self.data)
+
+    def col_count(self):
+        return len(self.data[0])
 
     @staticmethod
     def draw_tables(tablelist, **kwargs):
         spacing = kwargs.get('spacing', 2)
-        max_lengths = [ 0 ] * len(tablelist)
         row_counter = [ 0 ] * len(tablelist)
         lne_counter = [ 0 ] * len(tablelist)
         result = ''
         last_result_len = 0
 
         gen_list = [ tbl.draw_table_iter() for tbl in tablelist ]
-        gen_done = 0
+        gen_done = set()
 
-        while gen_done != len(gen_list):
+        while len(gen_done) != len(gen_list):
             draws_done = 0
 
             for gidx in range(len(gen_list)): # pylint: disable=consider-using-enumerate
                 gen = gen_list[gidx]
                 tbl = tablelist[gidx]
-                do_draw = True
+                do_draw = gidx not in gen_done
 
-                try:
-                    res = next(gen)
-                    if len(res) > max_lengths[gidx]:
-                        max_lengths[gidx] = len(res)
+                if do_draw:
+                    while True:
+                        try:
+                            res = next(gen)
+                            lne_counter[gidx] += 1
+                            if lne_counter[gidx] == tbl.cell_info.height:
+                                row_counter[gidx] += 1
+                                lne_counter[gidx] = 0
 
-                    lne_counter[gidx] += 1
-                    if lne_counter[gidx] == tbl.cell_info.height:
-                        row_counter[gidx] += 1
-                        lne_counter[gidx] = 0
-
-                        if tbl.cell_info.has_border and tbl.row_count() != row_counter[gidx]:
+                                if tbl.cell_info.has_border and tbl.row_count() != row_counter[gidx]:
+                                    do_draw = True
+                                    continue
+                        except StopIteration:
                             do_draw = False
-                except StopIteration:
-                    do_draw = False
-                    gen_done += 1
+                            gen_done.add(gidx)
+                        break
 
                 if do_draw:
                     result += res
                     draws_done += 1
                 else:
-                    if gidx != len(gen_list) - 1:
-                        result += ' ' * max_lengths[gidx]
+                    result += ' ' * (tbl.row_length())
 
                 if gidx != len(gen_list) - 1:
                     result += ' ' * spacing
@@ -151,16 +158,17 @@ def main():
 
     tbl = Table(cell_bordered)
     tbl.set_table_data([
-        [1, 0, 1, 1],
-        [1, 1, 0, 0],
-        [1, 0, 1, 0]
+        [1, 0, 1],
+        [0, 1, 0],
+        [1, 0, 1]
     ])
 
     tbl2 = Table(cell_bordered)
     tbl2.set_table_data([
         [0, 1, 1, 1],
         [0, 1, 0, 0],
-        [0, 1, 1, 1]
+        [0, 1, 1, 1],
+        [0, 1, 1, 1],
     ])
 
     print(tbl.draw_table())
