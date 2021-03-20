@@ -24,43 +24,47 @@ def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=N
 
     first_date = commits[0]['datetime']
     curdate = datetime.datetime(first_date.year, first_date.month, first_date.day)
+    labels.append(str(curdate))
     curdate += timedelta
 
     def append(val):
-        nonlocal row
+        nonlocal curdate, row
+
+        row.append(val)
+
         if len(row) == col_count:
             data.append(row)
             row = []
 
+            labels[-1] += ' - %s' % (curdate - timedelta)
             labels.append(str(curdate))
 
-        row.append(val)
+        curdate += timedelta
 
     for commit in commits:
         if filter_names is not None and commit['name'] not in filter_names:
             continue
 
-        print(commit)
-
         if curdate < commit['datetime']:
-            curdate += timedelta
             append(counter)
-            counter = 0
-
             while curdate < commit['datetime']:
-                curdate += timedelta
                 append(0)
+
+            counter = 1
         else:
             counter += 1
 
     if counter != 0:
-        row.append(counter)
-    while len(row) < col_count:
-        row.append(0)
+        append(counter)
 
-    data.append(row)
+    if len(row) != 0:
+        data.append(row)
+        for _ in range(col_count - len(row)):
+            append(0)
 
-    print(data)
+        data.pop()
+        labels.pop()
+
     tbl.set_table_data(data)
 
     tbl.row_labels = labels
