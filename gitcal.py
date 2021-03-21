@@ -13,6 +13,7 @@ def create_table_from_commits(cell_info, commits, **kwargs):
         filter_names = [ filter_names ]
     start_date = kwargs.get('start_date')
     end_date = kwargs.get('end_date')
+    make_labels = kwargs.get('make_labels', True)
 
     tbl = Table(cell_info)
 
@@ -25,7 +26,8 @@ def create_table_from_commits(cell_info, commits, **kwargs):
 
     first_date = commits[0]['datetime']
     curdate = datetime.datetime(first_date.year, first_date.month, first_date.day)
-    labels.append(shortdate(curdate, delta))
+    if make_labels:
+        labels.append(shortdate(curdate, delta))
     curdate += delta
 
     def append(val):
@@ -37,8 +39,9 @@ def create_table_from_commits(cell_info, commits, **kwargs):
             data.append(row)
             row = []
 
-            labels[-1] += ' - %s' % shortdate(curdate - delta, delta)
-            labels.append(shortdate(curdate, delta))
+            if make_labels:
+                labels[-1] += ' - %s' % shortdate(curdate - delta, delta)
+                labels.append(shortdate(curdate, delta))
 
         curdate += delta
 
@@ -68,10 +71,12 @@ def create_table_from_commits(cell_info, commits, **kwargs):
             append(0)
 
         data.pop()
-        labels.pop()
+        if make_labels:
+            labels.pop()
 
     tbl.set_table_data(data)
-    tbl.row_labels = labels
+    if make_labels:
+        tbl.row_labels = labels
 
     return tbl
 
