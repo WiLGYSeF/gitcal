@@ -3,6 +3,8 @@ class Table:
         self.data = [[]]
         self.cell_info = cell_info
 
+        self.table_name = None
+
         self.row_labels = {}
         self.label_sep = '  '
         self.label_lpad = True
@@ -27,18 +29,9 @@ class Table:
     def draw_row_iter(self, row, row_idx=-1):
         gen_list = [ self.draw_cell_iter(row[i]) for i in range(len(row)) ]
 
-        has_labels = len(self.row_labels) != 0
-        longest_label = -1
+        has_labels = self.has_labels()
+        longest_label = self.longest_label_length()
         did_label = False
-
-        val_list = self.row_labels
-        if isinstance(self.row_labels, dict):
-            val_list = self.row_labels.values()
-
-        for val in val_list:
-            if len(val) > longest_label:
-                longest_label = len(val)
-
         first_line = True
 
         for _ in range(self.cell_info.height):
@@ -91,10 +84,29 @@ class Table:
             return None
         return self.row_labels[row_idx]
 
-    def row_length(self):
+    def max_length(self, include_table_name=True):
         if self.cell_info.has_border:
-            return self.col_count() * self.cell_info.width - self.col_count() + 1
-        return self.col_count() * self.cell_info.width
+            length = self.col_count() * self.cell_info.width - self.col_count() + 1
+        else:
+            length = self.col_count() * self.cell_info.width
+
+        if include_table_name and self.table_name is not None and len(self.table_name) > length:
+            length = len(self.table_name)
+        return length
+
+    def longest_label_length(self):
+        val_list = self.row_labels
+        if isinstance(self.row_labels, dict):
+            val_list = self.row_labels.values()
+
+        length = 0
+        for val in val_list:
+            if len(val) > length:
+                length = len(val)
+        return length
+
+    def has_labels(self):
+        return len(self.row_labels) != 0
 
     def row_count(self):
         return len(self.data)
@@ -111,8 +123,32 @@ class Table:
         result = ''
         last_result_len = 0
 
-        gen_list = [ tbl.draw_table_iter() for tbl in tablelist ]
+        gen_list = []
         gen_done = set()
+        has_table_name = False
+
+        for tbl in tablelist:
+            gen_list.append(tbl.draw_table_iter())
+            if tbl.table_name is not None:
+                has_table_name = True
+
+        if has_table_name:
+            for tbl in tablelist:
+                if tbl.table_name is None:
+                    result += ' ' * tbl.max_length()
+                    continue
+
+                if tbl.has_labels() and tbl.left_label:
+                    result += ' ' * (tbl.longest_label_length() + len(tbl.label_sep))
+
+                result += tbl.table_name
+                result += ' ' * (tbl.max_length() - len(tbl.table_name))
+
+                if tbl.has_labels() and not tbl.left_label:
+                    result += ' ' * (tbl.longest_label_length() + len(tbl.label_sep))
+
+                result += ' ' * spacing
+            result += '\n'
 
         while len(gen_done) != tbl_count:
             draws_done = 0
@@ -144,7 +180,7 @@ class Table:
                     result += res
                     draws_done += 1
                 else:
-                    result += ' ' * (tbl.row_length())
+                    result += ' ' * tbl.max_length()
 
                 if gidx != tbl_count - 1:
                     result += ' ' * spacing
