@@ -158,6 +158,7 @@ def table_config_from_namespace(namespace):
         'border': namespace.border,
         'left_label': namespace.left_label,
         'delta': delta,
+        'make_labels': namespace.make_labels,
         'col_count': namespace.col_count
     }
 
@@ -179,6 +180,18 @@ def main(argv):
         dest='left_label', action='store_true', default=False,
         help='display labels on the right-hand side (default is left-hand side)'
     )
+    parser.add_argument('--make-labels',
+        action='store_true', default=True,
+        help='make labels for the table rows (default is true)'
+    )
+    parser.add_argument('--no-make-labels',
+        dest='make_labels', action='store_false',
+        help="don't make labels for the table rows (default is true)"
+    )
+    parser.add_argument('--col-count',
+        action='store', type=int, default=7,
+        help='sets the column count (default is 7)'
+    )
 
     parser.add_argument('--day', '--daily',
         dest='delta', action=DeltaAction, nargs=0,
@@ -187,11 +200,6 @@ def main(argv):
     parser.add_argument('--hour', '--hourly',
         dest='delta', action=DeltaAction, nargs=0,
         help='sets the delta value to 1 hour (default is 1 day)'
-    )
-
-    parser.add_argument('--col-count',
-        action='store', type=int, default=7,
-        help='sets the column count (default is 7)'
     )
 
     parser.add_argument('--table',
@@ -227,6 +235,7 @@ def main(argv):
             cell_bordered if cfg['border'] else cell_unborder,
             commits,
             delta=cfg['delta'],
+            make_labels=cfg['make_labels'],
             col_count=cfg['col_count']
         )
         tbl.left_label = cfg['left_label']

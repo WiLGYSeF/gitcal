@@ -93,7 +93,7 @@ class Table:
         if include_table_name and self.table_name is not None and len(self.table_name) > length:
             length = len(self.table_name)
 
-        if include_label:
+        if include_label and self.has_labels():
             length += len(self.label_sep) + self.longest_label_length()
         return length
 
