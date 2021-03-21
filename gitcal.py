@@ -6,14 +6,15 @@ import subprocess
 from table import Table, CellInfo
 
 
-def create_table_from_commits(cell_info, commits, delta=None, filter_names=None):
-    if delta is None:
-        delta = datetime.timedelta(days=1)
+def create_table_from_commits(cell_info, commits, **kwargs):
+    delta = kwargs.get('delta', datetime.timedelta(days=1))
+    filter_names = kwargs.get('filter_names')
     if filter_names is not None and not isinstance(filter_names, list):
         filter_names = [ filter_names ]
+    start_date = kwargs.get('start_date')
+    end_date = kwargs.get('end_date')
 
     tbl = Table(cell_info)
-    tbl.left_label = True
 
     data = []
     row = []
@@ -42,6 +43,10 @@ def create_table_from_commits(cell_info, commits, delta=None, filter_names=None)
         curdate += delta
 
     for commit in commits:
+        if start_date is not None and commit['datetime'] < start_date:
+            continue
+        if end_date is not None and commit['datetime'] > end_date:
+            break
         if filter_names is not None and commit['name'] not in filter_names:
             continue
 
@@ -66,7 +71,6 @@ def create_table_from_commits(cell_info, commits, delta=None, filter_names=None)
         labels.pop()
 
     tbl.set_table_data(data)
-
     tbl.row_labels = labels
 
     return tbl
