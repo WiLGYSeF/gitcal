@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 
+import argparse
 import datetime
 import subprocess
+import sys
 
 from table import Table, CellInfo
 
@@ -128,7 +130,15 @@ def getval(val):
         return '  '
     return '\x1b[42m  \x1b[0m'
 
-def main():
+def main(argv):
+    parser = argparse.ArgumentParser(description='Show git commits in a visual calendar-like format')
+    parser.add_argument('--no-border',
+        action='store_true', default=False,
+        help='removes the cell borders from the output'
+    )
+
+    argspace = parser.parse_args(argv)
+
     cell_bordered = CellInfo(
         width=4,
         height=3,
@@ -144,15 +154,19 @@ def main():
         getval=getval
     )
 
+    cell_info = cell_bordered
+    if argspace.no_border:
+        cell_info = cell_unborder
+
     commits = get_commit_data()
     commits.reverse()
 
-    tbl = create_table_from_commits(cell_bordered, commits)
+    tbl = create_table_from_commits(cell_info, commits)
     tbl.table_name = 'aaaa'
     tbl.left_label = True
 
     tbl2 = create_table_from_commits(
-        cell_unborder,
+        cell_info,
         commits,
         start_date=datetime.datetime.strptime('2021-01-15', '%Y-%m-%d'),
         make_labels=True
@@ -160,7 +174,7 @@ def main():
     #tbl2.table_name = 'bbbb'
 
     tbl3 = create_table_from_commits(
-        cell_bordered,
+        cell_info,
         commits,
         start_date=datetime.datetime.strptime('2021-01-15', '%Y-%m-%d'),
         end_date=datetime.datetime.strptime('2021-01-29', '%Y-%m-%d'),
@@ -168,37 +182,6 @@ def main():
     )
     tbl3.table_name = 'cccc'
     print(Table.draw_tables( (tbl, tbl2, tbl3) ))
-    return
-
-    tbl = Table(cell_bordered)
-    tbl.set_table_data([
-        [1, 0, 1],
-        [0, 1, 0],
-        [1, 0, 1]
-    ])
-
-    tbl_long = Table(cell_bordered)
-    tbl_long.set_table_data([
-        [1, 0],
-        [1, 0],
-        [1, 1],
-        [0, 0],
-        [0, 0],
-        [1, 1],
-        [0, 1],
-    ])
-
-    tbl2 = Table(cell_bordered)
-    tbl2.set_table_data([
-        [0, 1, 1, 1],
-        [0, 1, 0, 0],
-        [0, 1, 1, 1],
-        [0, 1, 1, 1],
-    ])
-
-    print(tbl.draw_table())
-
-    print(Table.draw_tables( (tbl, tbl_long, tbl2) ))
 
 if __name__ == '__main__':
-    main()
+    main(sys.argv[1:])
