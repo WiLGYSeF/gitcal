@@ -112,6 +112,8 @@ class Table:
         return len(self.data)
 
     def col_count(self):
+        if self.row_count() == 0:
+            return 0
         return len(self.data[0])
 
     @staticmethod

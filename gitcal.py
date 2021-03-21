@@ -14,17 +14,21 @@ def create_table_from_commits(cell_info, commits, **kwargs):
     start_date = kwargs.get('start_date')
     end_date = kwargs.get('end_date')
     make_labels = kwargs.get('make_labels', True)
+    col_count = kwargs.get('col_count', 7)
 
     tbl = Table(cell_info)
 
     data = []
     row = []
     labels = []
+    start_idx = 0
     counter = 0
 
-    col_count = 7
+    if start_date is not None:
+        while start_idx < len(commits) and commits[start_idx]['datetime'] < start_date:
+            start_idx += 1
 
-    first_date = commits[0]['datetime']
+    first_date = commits[start_idx]['datetime']
     curdate = datetime.datetime(first_date.year, first_date.month, first_date.day)
     if make_labels:
         labels.append(shortdate(curdate, delta))
@@ -45,7 +49,8 @@ def create_table_from_commits(cell_info, commits, **kwargs):
 
         curdate += delta
 
-    for commit in commits:
+    for idx in range(start_idx, len(commits)):
+        commit = commits[idx]
         if start_date is not None and commit['datetime'] < start_date:
             continue
         if end_date is not None and commit['datetime'] > end_date:
@@ -143,7 +148,17 @@ def main():
     commits.reverse()
 
     tbl = create_table_from_commits(cell_bordered, commits)
-    print(tbl.draw_table())
+    tbl.table_name = 'aaaa'
+    tbl.left_label = True
+
+    tbl2 = create_table_from_commits(
+        cell_unborder,
+        commits,
+        start_date=datetime.datetime.strptime('2021-01-15', '%Y-%m-%d'),
+        make_labels=True
+    )
+    tbl2.table_name = 'bbbb'
+    print(Table.draw_tables( (tbl, tbl2) ))
     return
 
     tbl = Table(cell_bordered)
