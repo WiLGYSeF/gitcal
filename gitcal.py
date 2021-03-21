@@ -157,7 +157,8 @@ def table_config_from_namespace(namespace):
     return {
         'border': namespace.border,
         'left_label': namespace.left_label,
-        'delta': delta
+        'delta': delta,
+        'col_count': namespace.col_count
     }
 
 def main(argv):
@@ -187,6 +188,12 @@ def main(argv):
         dest='delta', action=DeltaAction, nargs=0,
         help='sets the delta value to 1 hour (default is 1 day)'
     )
+
+    parser.add_argument('--col-count',
+        action='store', type=int, default=7,
+        help='sets the column count (default is 7)'
+    )
+
     parser.add_argument('--table',
         action=TableAction, nargs=0,
         help='creates a new table to display alongside the others, all table options are applied to the previous table'
@@ -216,7 +223,12 @@ def main(argv):
     tablelist = []
 
     for cfg in table_configs:
-        tbl = create_table_from_commits(cell_bordered if cfg['border'] else cell_unborder, commits, delta=cfg['delta'])
+        tbl = create_table_from_commits(
+            cell_bordered if cfg['border'] else cell_unborder,
+            commits,
+            delta=cfg['delta'],
+            col_count=cfg['col_count']
+        )
         tbl.left_label = cfg['left_label']
         tablelist.append(tbl)
 
