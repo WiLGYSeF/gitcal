@@ -84,7 +84,7 @@ class Table:
             return None
         return self.row_labels[row_idx]
 
-    def max_length(self, include_table_name=True):
+    def max_length(self, include_table_name=True, include_label=True):
         if self.cell_info.has_border:
             length = self.col_count() * self.cell_info.width - self.col_count() + 1
         else:
@@ -92,6 +92,9 @@ class Table:
 
         if include_table_name and self.table_name is not None and len(self.table_name) > length:
             length = len(self.table_name)
+
+        if include_label:
+            length += len(self.label_sep) + self.longest_label_length()
         return length
 
     def longest_label_length(self):
@@ -137,14 +140,14 @@ class Table:
         if has_table_name:
             for tbl in tablelist:
                 if tbl.table_name is None:
-                    result += ' ' * tbl.max_length()
+                    result += ' ' * (tbl.max_length() + spacing)
                     continue
 
                 if tbl.has_labels() and tbl.left_label:
                     result += ' ' * (tbl.longest_label_length() + len(tbl.label_sep))
 
                 result += tbl.table_name
-                result += ' ' * (tbl.max_length() - len(tbl.table_name))
+                result += ' ' * (tbl.max_length(include_label=False) - len(tbl.table_name))
 
                 if tbl.has_labels() and not tbl.left_label:
                     result += ' ' * (tbl.longest_label_length() + len(tbl.label_sep))

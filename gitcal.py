@@ -157,8 +157,17 @@ def main():
         start_date=datetime.datetime.strptime('2021-01-15', '%Y-%m-%d'),
         make_labels=True
     )
-    tbl2.table_name = 'bbbb'
-    print(Table.draw_tables( (tbl, tbl2) ))
+    #tbl2.table_name = 'bbbb'
+
+    tbl3 = create_table_from_commits(
+        cell_bordered,
+        commits,
+        start_date=datetime.datetime.strptime('2021-01-15', '%Y-%m-%d'),
+        end_date=datetime.datetime.strptime('2021-01-29', '%Y-%m-%d'),
+        make_labels=True
+    )
+    tbl3.table_name = 'cccc'
+    print(Table.draw_tables( (tbl, tbl2, tbl3) ))
     return
 
     tbl = Table(cell_bordered)
