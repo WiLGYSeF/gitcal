@@ -91,7 +91,7 @@ def shortdate(dtime, delta):
     if delta == datetime.timedelta(days=1):
         return '%04d-%02d-%02d' % (dtime.year, dtime.month, dtime.day)
     if delta == datetime.timedelta(hours=1):
-        return '%04d-%02d-%02d %02d' % (dtime.year, dtime.month, dtime.day, dtime.hour)
+        return '%04d-%02d-%02d %02dh' % (dtime.year, dtime.month, dtime.day, dtime.hour)
     return str(dtime)
 
 def get_commit_data():
@@ -136,10 +136,28 @@ class TableAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         table_configs.append(table_config_from_namespace(namespace))
 
+class DeltaAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        val = option_string
+        if val.startswith('--'):
+            val = val[2:]
+
+        if val in ('h', 'hour', 'hours', 'hourly'):
+            setattr(namespace, 'delta', datetime.timedelta(hours=1))
+        elif val in ('d', 'day', 'days', 'daily'):
+            setattr(namespace, 'delta', datetime.timedelta(days=1))
+        else:
+            raise ValueError('unknown delta value')
+
 def table_config_from_namespace(namespace):
+    delta = getattr(namespace, 'delta', None)
+    if delta is None:
+        delta = datetime.timedelta(days=1)
+
     return {
         'border': namespace.border,
-        'left_label': namespace.left_label
+        'left_label': namespace.left_label,
+        'delta': delta
     }
 
 def main(argv):
@@ -160,9 +178,17 @@ def main(argv):
         dest='left_label', action='store_true', default=False,
         help='display labels on the right-hand side (default is left-hand side)'
     )
+
+    parser.add_argument('--day', '--daily',
+        dest='delta', action=DeltaAction, nargs=0,
+        help='sets the delta value to 1 day  (default is 1 day)'
+    )
+    parser.add_argument('--hour', '--hourly',
+        dest='delta', action=DeltaAction, nargs=0,
+        help='sets the delta value to 1 hour (default is 1 day)'
+    )
     parser.add_argument('--table',
-        action=TableAction,
-        nargs=0,
+        action=TableAction, nargs=0,
         help='creates a new table to display alongside the others, all table options are applied to the previous table'
     )
 
@@ -190,30 +216,11 @@ def main(argv):
     tablelist = []
 
     for cfg in table_configs:
-        tbl = create_table_from_commits(cell_bordered if cfg['border'] else cell_unborder, commits)
+        tbl = create_table_from_commits(cell_bordered if cfg['border'] else cell_unborder, commits, delta=cfg['delta'])
         tbl.left_label = cfg['left_label']
         tablelist.append(tbl)
 
     print(Table.draw_tables(tablelist))
-    return
-
-    tbl2 = create_table_from_commits(
-        cell_info,
-        commits,
-        start_date=datetime.datetime.strptime('2021-01-15', '%Y-%m-%d'),
-        make_labels=True
-    )
-    #tbl2.table_name = 'bbbb'
-
-    tbl3 = create_table_from_commits(
-        cell_info,
-        commits,
-        start_date=datetime.datetime.strptime('2021-01-15', '%Y-%m-%d'),
-        end_date=datetime.datetime.strptime('2021-01-29', '%Y-%m-%d'),
-        make_labels=True
-    )
-    tbl3.table_name = 'cccc'
-    print(Table.draw_tables( (tbl, tbl2, tbl3) ))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
