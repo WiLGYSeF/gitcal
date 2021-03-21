@@ -6,9 +6,9 @@ import subprocess
 from table import Table, CellInfo
 
 
-def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=None):
-    if timedelta is None:
-        timedelta = datetime.timedelta(days=1)
+def create_table_from_commits(cell_info, commits, delta=None, filter_names=None):
+    if delta is None:
+        delta = datetime.timedelta(days=1)
     if filter_names is not None and not isinstance(filter_names, list):
         filter_names = [ filter_names ]
 
@@ -24,8 +24,8 @@ def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=N
 
     first_date = commits[0]['datetime']
     curdate = datetime.datetime(first_date.year, first_date.month, first_date.day)
-    labels.append(str(curdate))
-    curdate += timedelta
+    labels.append(shortdate(curdate, delta))
+    curdate += delta
 
     def append(val):
         nonlocal curdate, row
@@ -36,10 +36,10 @@ def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=N
             data.append(row)
             row = []
 
-            labels[-1] += ' - %s' % (curdate - timedelta)
-            labels.append(str(curdate))
+            labels[-1] += ' - %s' % shortdate(curdate - delta, delta)
+            labels.append(shortdate(curdate, delta))
 
-        curdate += timedelta
+        curdate += delta
 
     for commit in commits:
         if filter_names is not None and commit['name'] not in filter_names:
@@ -70,6 +70,13 @@ def create_table_from_commits(cell_info, commits, timedelta=None, filter_names=N
     tbl.row_labels = labels
 
     return tbl
+
+def shortdate(dtime, delta):
+    if delta == datetime.timedelta(days=1):
+        return '%04d-%02d-%02d' % (dtime.year, dtime.month, dtime.day)
+    if delta == datetime.timedelta(hours=1):
+        return '%04d-%02d-%02d %02d' % (dtime.year, dtime.month, dtime.day, dtime.hour)
+    return str(dtime)
 
 def get_commit_data():
     output = subprocess.check_output([
