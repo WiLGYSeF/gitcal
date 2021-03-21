@@ -130,18 +130,40 @@ def getval(val):
         return '  '
     return '\x1b[42m  \x1b[0m'
 
+table_configs = []
+
+class TableAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        table_configs.append(table_config_from_namespace(namespace))
+
+def table_config_from_namespace(namespace):
+    return {
+        'border': namespace.border,
+        'left_label': not namespace.right_label
+    }
+
 def main(argv):
     parser = argparse.ArgumentParser(description='Show git commits in a visual calendar-like format')
+    parser.add_argument('--border',
+        action='store_true', default=True,
+        help='removes the cell borders from the output (default is bordered)'
+    )
     parser.add_argument('--no-border',
-        action='store_true', default=False,
+        dest='border', action='store_false', default=False,
         help='removes the cell borders from the output (default is bordered)'
     )
     parser.add_argument('--right-label',
         action='store_true', default=False,
         help='display labels on the right-hand side (default is left-hand side)'
     )
+    parser.add_argument('--table',
+        action=TableAction,
+        nargs=0,
+        help=''
+    )
 
     argspace = parser.parse_args(argv)
+    table_configs.append(table_config_from_namespace(argspace))
 
     cell_bordered = CellInfo(
         width=4,
@@ -158,16 +180,18 @@ def main(argv):
         getval=getval
     )
 
-    cell_info = cell_bordered
-    if argspace.no_border:
-        cell_info = cell_unborder
-
     commits = get_commit_data()
     commits.reverse()
 
-    tbl = create_table_from_commits(cell_info, commits)
-    tbl.table_name = 'aaaa'
-    tbl.left_label = not argspace.right_label
+    tablelist = []
+
+    for cfg in table_configs:
+        tbl = create_table_from_commits(cell_bordered if cfg['border'] else cell_unborder, commits)
+        tbl.left_label = cfg['left_label']
+        tablelist.append(tbl)
+
+    print(Table.draw_tables(tablelist))
+    return
 
     tbl2 = create_table_from_commits(
         cell_info,
