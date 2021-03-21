@@ -139,7 +139,7 @@ class TableAction(argparse.Action):
 def table_config_from_namespace(namespace):
     return {
         'border': namespace.border,
-        'left_label': not namespace.right_label
+        'left_label': namespace.left_label
     }
 
 def main(argv):
@@ -152,14 +152,18 @@ def main(argv):
         dest='border', action='store_false', default=False,
         help='removes the cell borders from the output (default is bordered)'
     )
+    parser.add_argument('--left-label',
+        action='store_true', default=True,
+        help='display labels on the left-hand side (default is left-hand side)'
+    )
     parser.add_argument('--right-label',
-        action='store_true', default=False,
+        dest='left_label', action='store_true', default=False,
         help='display labels on the right-hand side (default is left-hand side)'
     )
     parser.add_argument('--table',
         action=TableAction,
         nargs=0,
-        help=''
+        help='creates a new table to display alongside the others, all table options are applied to the previous table'
     )
 
     argspace = parser.parse_args(argv)
