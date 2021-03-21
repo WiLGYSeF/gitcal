@@ -134,7 +134,11 @@ def main(argv):
     parser = argparse.ArgumentParser(description='Show git commits in a visual calendar-like format')
     parser.add_argument('--no-border',
         action='store_true', default=False,
-        help='removes the cell borders from the output'
+        help='removes the cell borders from the output (default is bordered)'
+    )
+    parser.add_argument('--right-label',
+        action='store_true', default=False,
+        help='display labels on the right-hand side (default is left-hand side)'
     )
 
     argspace = parser.parse_args(argv)
@@ -163,7 +167,7 @@ def main(argv):
 
     tbl = create_table_from_commits(cell_info, commits)
     tbl.table_name = 'aaaa'
-    tbl.left_label = True
+    tbl.left_label = not argspace.right_label
 
     tbl2 = create_table_from_commits(
         cell_info,
