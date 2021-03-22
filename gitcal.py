@@ -17,11 +17,17 @@ def draw_cell_unborder(val):
     yield val
 
 def getval(tbl, val):
+    celldata = '  '
+    if tbl.config['print_num']:
+        celldata = '%2d' % val
+        if len(celldata) > 2:
+            celldata = '##'
+
     if val == 0:
         return '\x1b[100m  \x1b[0m'
-    if tbl.config['dim_threshold'] > val:
-        return '\x1b[42m  \x1b[0m'
-    return '\x1b[102m  \x1b[0m'
+    if tbl.config['threshold'] > val:
+        return '\x1b[102m%s\x1b[0m' % celldata
+    return '\x1b[42m%s\x1b[0m' % celldata
 
 table_configs = []
 
@@ -63,7 +69,8 @@ def table_config_from_namespace(namespace):
         'col_count': namespace.col_count,
         'filter_names': filter_names,
 
-        'dim_threshold': namespace.dim_threshold,
+        'threshold': namespace.threshold,
+        'print_num': namespace.print_num,
     }
 
 def main(argv):
@@ -96,7 +103,7 @@ def main(argv):
     )
     parser.add_argument('--no-make-labels',
         dest='make_labels', action='store_false',
-        help="don't make labels for the table rows (default is true)"
+        help='do not make labels for the table rows (default is true)'
     )
     parser.add_argument('--col-count',
         action='store', type=int, default=7,
@@ -107,9 +114,17 @@ def main(argv):
         help='sets the current table name. resets after each --table'
     )
 
-    parser.add_argument('--dim-threshold',
+    parser.add_argument('--threshold',
         action='store', type=int, default=0,
-        help='set the threshold where the cell is no longer dim (default is 0)'
+        help='set the threshold value where the cell value is no longer considered small (default is 0)'
+    )
+    parser.add_argument('--print-num',
+        action='store_true', default=False,
+        help='prints the commit counts in the cells (default is false)'
+    )
+    parser.add_argument('--no-print-num',
+        dest='print_num', action='store_false',
+        help='do not print the commit counts in the cells (default is false)'
     )
 
     parser.add_argument('--day', '--daily',
