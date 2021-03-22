@@ -10,13 +10,13 @@ from table import Table, CellInfo
 
 def create_table_from_commits(cell_info, commits, **kwargs):
     delta = kwargs.get('delta', datetime.timedelta(days=1))
-    filter_names = kwargs.get('filter_names')
-    if filter_names is not None and not isinstance(filter_names, list):
-        filter_names = [ filter_names ]
     start_date = kwargs.get('start_date')
     end_date = kwargs.get('end_date')
     make_labels = kwargs.get('make_labels', True)
     col_count = kwargs.get('col_count', 7)
+    filter_names = kwargs.get('filter_names')
+    if filter_names is not None and not isinstance(filter_names, list):
+        filter_names = [ filter_names ]
 
     tbl = Table(cell_info)
 
@@ -154,16 +154,22 @@ def table_config_from_namespace(namespace):
     if delta is None:
         delta = datetime.timedelta(days=1)
 
+    filter_names = namespace.filter
+    namespace.filter = []
+
     return {
         'border': namespace.border,
         'left_label': namespace.left_label,
         'delta': delta,
         'make_labels': namespace.make_labels,
-        'col_count': namespace.col_count
+        'col_count': namespace.col_count,
+        'filter_names': filter_names,
     }
 
 def main(argv):
-    parser = argparse.ArgumentParser(description='Show git commits in a visual calendar-like format')
+    parser = argparse.ArgumentParser(
+        description='Show git commits in a visual calendar-like format'
+    )
     parser.add_argument('--border',
         action='store_true', default=True,
         help='removes the cell borders from the output (default is bordered)'
@@ -202,6 +208,11 @@ def main(argv):
         help='sets the delta value to 1 hour (default is 1 day)'
     )
 
+    parser.add_argument('--filter',
+        action='append',
+        help='adds a git username to filter for in the table entries. resets after each --table'
+    )
+
     parser.add_argument('--table',
         action=TableAction, nargs=0,
         help='creates a new table to display alongside the others, all table options are applied to the previous table'
@@ -236,7 +247,8 @@ def main(argv):
             commits,
             delta=cfg['delta'],
             make_labels=cfg['make_labels'],
-            col_count=cfg['col_count']
+            col_count=cfg['col_count'],
+            filter_names=cfg['filter_names'],
         )
         tbl.left_label = cfg['left_label']
         tablelist.append(tbl)
