@@ -19,7 +19,9 @@ def draw_cell_unborder(val):
 def getval(tbl, val):
     if val == 0:
         return '\x1b[100m  \x1b[0m'
-    return '\x1b[42m  \x1b[0m'
+    if tbl.config['dim_threshold'] > val:
+        return '\x1b[42m  \x1b[0m'
+    return '\x1b[102m  \x1b[0m'
 
 table_configs = []
 
@@ -60,6 +62,8 @@ def table_config_from_namespace(namespace):
         'make_labels': namespace.make_labels,
         'col_count': namespace.col_count,
         'filter_names': filter_names,
+
+        'dim_threshold': namespace.dim_threshold,
     }
 
 def main(argv):
@@ -101,6 +105,11 @@ def main(argv):
     parser.add_argument('--tbl-name',
         action='store',
         help='sets the current table name. resets after each --table'
+    )
+
+    parser.add_argument('--dim-threshold',
+        action='store', type=int, default=0,
+        help='set the threshold where the cell is no longer dim (default is 0)'
     )
 
     parser.add_argument('--day', '--daily',
@@ -158,6 +167,7 @@ def main(argv):
             col_count=cfg['col_count'],
             filter_names=cfg['filter_names'],
         )
+        setattr(tbl, 'config', cfg)
         tbl.table_name = cfg['tbl_name']
         tbl.left_label = cfg['left_label']
         tbl.label_sep = cfg['label_sep']
