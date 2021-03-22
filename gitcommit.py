@@ -90,9 +90,9 @@ def create_table_from_commits(cell_info, commits, **kwargs):
     return tbl
 
 def shortdate(dtime, delta):
-    if delta == datetime.timedelta(days=1):
+    if delta.seconds % 86400 == 0:
         return '%04d-%02d-%02d' % (dtime.year, dtime.month, dtime.day)
-    if delta == datetime.timedelta(hours=1):
+    if delta.seconds % 3600 == 0:
         return '%04d-%02d-%02d %02dh' % (dtime.year, dtime.month, dtime.day, dtime.hour)
     return str(dtime)
 

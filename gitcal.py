@@ -2,6 +2,7 @@
 
 import argparse
 import datetime
+import re
 import sys
 
 from table import Table, CellInfo
@@ -37,16 +38,19 @@ class TableAction(argparse.Action):
 
 class DeltaAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
-        val = option_string
-        if val.startswith('--'):
-            val = val[2:]
+        val = values
 
-        if val in ('h', 'hour', 'hours', 'hourly'):
-            setattr(namespace, 'delta', datetime.timedelta(hours=1))
-        elif val in ('d', 'day', 'days', 'daily'):
-            setattr(namespace, 'delta', datetime.timedelta(days=1))
-        else:
-            raise ValueError('unknown delta value')
+        match = re.fullmatch(r'([0-9]+) *h(?:ours?)?', val)
+        if match is not None:
+            setattr(namespace, 'delta', datetime.timedelta(hours=int(match[1])))
+            return
+
+        match = re.fullmatch(r'([0-9]+) *d(?:ays?)?', val)
+        if match is not None:
+            setattr(namespace, 'delta', datetime.timedelta(days=int(match[1])))
+            return
+
+        raise ValueError('unknown delta value')
 
 def table_config_from_namespace(namespace):
     tbl_name = namespace.tbl_name
@@ -69,11 +73,11 @@ def table_config_from_namespace(namespace):
         'make_labels': namespace.make_labels,
         'labels_inclusive': namespace.labels_inclusive,
 
-        'delta': delta,
-        'filter_names': filter_names,
-
         'threshold': namespace.threshold,
         'print_num': namespace.print_num,
+
+        'delta': delta,
+        'filter_names': filter_names,
     }
 
 def main(argv):
@@ -141,13 +145,9 @@ def main(argv):
         help='do not print the commit counts in the cells (default is false)'
     )
 
-    parser.add_argument('--day', '--daily',
-        dest='delta', action=DeltaAction, nargs=0,
-        help='sets the delta value to 1 day  (default is 1 day)'
-    )
-    parser.add_argument('--hour', '--hourly',
-        dest='delta', action=DeltaAction, nargs=0,
-        help='sets the delta value to 1 hour (default is 1 day)'
+    parser.add_argument('--delta',
+        action=DeltaAction,
+        help='sets the delta value of each cell (default is 1 day)'
     )
 
     parser.add_argument('--filter',
