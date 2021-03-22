@@ -164,6 +164,7 @@ def table_config_from_namespace(namespace):
         'tbl_name': tbl_name,
         'border': namespace.border,
         'left_label': namespace.left_label,
+        'label_sep': namespace.label_sep,
         'delta': delta,
         'make_labels': namespace.make_labels,
         'col_count': namespace.col_count,
@@ -189,6 +190,10 @@ def main(argv):
     parser.add_argument('--right-label',
         dest='left_label', action='store_true', default=False,
         help='display labels on the right-hand side (default is left-hand side)'
+    )
+    parser.add_argument('--label-sep',
+        action='store', default=' ' * 2,
+        help='set the string used to separate the table and labels'
     )
     parser.add_argument('--make-labels',
         action='store_true', default=True,
@@ -225,6 +230,10 @@ def main(argv):
         action=TableAction, nargs=0,
         help='creates a new table to display alongside the others, all table options are applied to the previous table'
     )
+    parser.add_argument('--spacing',
+        action='store', type=int, default=2,
+        help='change the spacing between tables (default is 2)'
+    )
 
     argspace = parser.parse_args(argv)
     table_configs.append(table_config_from_namespace(argspace))
@@ -260,9 +269,13 @@ def main(argv):
         )
         tbl.table_name = cfg['tbl_name']
         tbl.left_label = cfg['left_label']
+        tbl.label_sep = cfg['label_sep']
         tablelist.append(tbl)
 
-    print(Table.draw_tables(tablelist))
+    print(Table.draw_tables(
+        tablelist,
+        spacing=argspace.spacing,
+    ))
 
 if __name__ == '__main__':
     main(sys.argv[1:])
