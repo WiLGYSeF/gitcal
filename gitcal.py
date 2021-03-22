@@ -16,7 +16,7 @@ def draw_cell_bordered(val):
 def draw_cell_unborder(val):
     yield val
 
-def getval(val):
+def getval(tbl, val):
     if val == 0:
         return '\x1b[100m  \x1b[0m'
     return '\x1b[42m  \x1b[0m'

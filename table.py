@@ -73,7 +73,7 @@ class Table:
             first_line = False
 
     def draw_cell_iter(self, val):
-        for res in self.cell_info.fnc_draw_cell(self.cell_info.fnc_getval(val)):
+        for res in self.cell_info.fnc_draw_cell(self.cell_info.fnc_getval(self, val)):
             yield res
 
     def get_row_label(self, row_idx):
