@@ -40,6 +40,11 @@ class DeltaAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         val = values
 
+        match = re.fullmatch(r'([0-9]+) *m(?:inutes?)?', val)
+        if match is not None:
+            setattr(namespace, 'delta', datetime.timedelta(minutes=int(match[1])))
+            return
+
         match = re.fullmatch(r'([0-9]+) *h(?:ours?)?', val)
         if match is not None:
             setattr(namespace, 'delta', datetime.timedelta(hours=int(match[1])))
@@ -50,7 +55,7 @@ class DeltaAction(argparse.Action):
             setattr(namespace, 'delta', datetime.timedelta(days=int(match[1])))
             return
 
-        raise ValueError('unknown delta value')
+        raise ValueError('unknown delta value: %s' % val)
 
 def table_config_from_namespace(namespace):
     tbl_name = namespace.tbl_name
@@ -60,12 +65,20 @@ def table_config_from_namespace(namespace):
     if delta is None:
         delta = datetime.timedelta(days=1)
 
+    col_count = namespace.col_count
+    if col_count is None or col_count.lower() == 'guess':
+        col_count = guess_col_count(delta)
+        if col_count is None:
+            col_count = 10
+    else:
+        col_count = int(col_count)
+
     filter_names = namespace.filter
     namespace.filter = []
 
     return {
         'tbl_name': tbl_name,
-        'col_count': namespace.col_count,
+        'col_count': col_count,
         'border': namespace.border,
 
         'left_label': namespace.left_label,
@@ -80,6 +93,33 @@ def table_config_from_namespace(namespace):
         'filter_names': filter_names,
     }
 
+def guess_col_count(delta, min_col=4, max_col=12):
+    timeframes = [
+        60,
+        3600,
+        4 * 3600,
+        6 * 3600,
+        86400,
+        7 * 86400,
+        14 * 86400
+    ]
+
+    if delta.seconds == 0:
+        return None
+
+    for i in range(len(timeframes)): # pylint: disable=consider-using-enumerate
+        tframe = timeframes[i]
+        if delta.seconds < tframe:
+            count = tframe // delta.seconds
+            if count < min_col:
+                i += 1
+                count = timeframes[i] // delta.seconds
+            if count > max_col and timeframes[i - 1] > delta.seconds:
+                i -= 1
+                count = timeframes[i] // delta.seconds
+            return count
+    return None
+
 def main(argv):
     parser = argparse.ArgumentParser(
         description='Show git commits in a visual calendar-like format'
@@ -90,8 +130,8 @@ def main(argv):
         help='sets the current table name. resets after each --table'
     )
     parser.add_argument('--col-count',
-        action='store', type=int, default=7,
-        help='sets the column count (default is 7)'
+        action='store', default=None,
+        help='sets the column count (default is "guess" based on the --delta value)'
     )
 
     parser.add_argument('--border',
