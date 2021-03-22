@@ -5,11 +5,14 @@ from table import Table
 
 
 def create_table_from_commits(cell_info, commits, **kwargs):
+    col_count = kwargs.get('col_count', 7)
+    make_labels = kwargs.get('make_labels', True)
+    labels_inclusive = kwargs.get('labels_inclusive', True)
+
     delta = kwargs.get('delta', datetime.timedelta(days=1))
     start_date = kwargs.get('start_date')
     end_date = kwargs.get('end_date')
-    make_labels = kwargs.get('make_labels', True)
-    col_count = kwargs.get('col_count', 7)
+
     filter_names = kwargs.get('filter_names')
     if filter_names is not None and not isinstance(filter_names, list):
         filter_names = [ filter_names ]
@@ -42,7 +45,10 @@ def create_table_from_commits(cell_info, commits, **kwargs):
             row = []
 
             if make_labels:
-                labels[-1] += ' - %s' % shortdate(curdate - delta, delta)
+                labels[-1] += ' - %s' % shortdate(
+                    (curdate - delta) if labels_inclusive else curdate,
+                    delta
+                )
                 labels.append(shortdate(curdate, delta))
 
         curdate += delta

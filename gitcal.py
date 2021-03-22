@@ -61,12 +61,15 @@ def table_config_from_namespace(namespace):
 
     return {
         'tbl_name': tbl_name,
+        'col_count': namespace.col_count,
         'border': namespace.border,
+
         'left_label': namespace.left_label,
         'label_sep': namespace.label_sep,
-        'delta': delta,
         'make_labels': namespace.make_labels,
-        'col_count': namespace.col_count,
+        'labels_inclusive': namespace.labels_inclusive,
+
+        'delta': delta,
         'filter_names': filter_names,
 
         'threshold': namespace.threshold,
@@ -77,6 +80,16 @@ def main(argv):
     parser = argparse.ArgumentParser(
         description='Show git commits in a visual calendar-like format'
     )
+
+    parser.add_argument('--tbl-name',
+        action='store',
+        help='sets the current table name. resets after each --table'
+    )
+    parser.add_argument('--col-count',
+        action='store', type=int, default=7,
+        help='sets the column count (default is 7)'
+    )
+
     parser.add_argument('--border',
         action='store_true', default=True,
         help='removes the cell borders from the output (default is bordered)'
@@ -85,6 +98,7 @@ def main(argv):
         dest='border', action='store_false', default=False,
         help='removes the cell borders from the output (default is bordered)'
     )
+
     parser.add_argument('--left-label',
         action='store_true', default=True,
         help='display labels on the left-hand side (default is left-hand side)'
@@ -105,13 +119,13 @@ def main(argv):
         dest='make_labels', action='store_false',
         help='do not make labels for the table rows (default is true)'
     )
-    parser.add_argument('--col-count',
-        action='store', type=int, default=7,
-        help='sets the column count (default is 7)'
+    parser.add_argument('--labels-inclusive',
+        action='store_true', default=True,
+        help='the end label range is inclusive'
     )
-    parser.add_argument('--tbl-name',
-        action='store',
-        help='sets the current table name. resets after each --table'
+    parser.add_argument('--labels-not-inclusive',
+        dest='labels_inclusive', action='store_false',
+        help='the end label range is not inclusive'
     )
 
     parser.add_argument('--threshold',
@@ -177,9 +191,10 @@ def main(argv):
         tbl = create_table_from_commits(
             cell_bordered if cfg['border'] else cell_unborder,
             commits,
-            delta=cfg['delta'],
-            make_labels=cfg['make_labels'],
             col_count=cfg['col_count'],
+            make_labels=cfg['make_labels'],
+            labels_inclusive=cfg['labels_inclusive'],
+            delta=cfg['delta'],
             filter_names=cfg['filter_names'],
         )
         setattr(tbl, 'config', cfg)
