@@ -150,6 +150,9 @@ class DeltaAction(argparse.Action):
             raise ValueError('unknown delta value')
 
 def table_config_from_namespace(namespace):
+    tbl_name = namespace.tbl_name
+    namespace.tbl_name = None
+
     delta = getattr(namespace, 'delta', None)
     if delta is None:
         delta = datetime.timedelta(days=1)
@@ -158,6 +161,7 @@ def table_config_from_namespace(namespace):
     namespace.filter = []
 
     return {
+        'tbl_name': tbl_name,
         'border': namespace.border,
         'left_label': namespace.left_label,
         'delta': delta,
@@ -197,6 +201,10 @@ def main(argv):
     parser.add_argument('--col-count',
         action='store', type=int, default=7,
         help='sets the column count (default is 7)'
+    )
+    parser.add_argument('--tbl-name',
+        action='store',
+        help='sets the current table name. resets after each --table'
     )
 
     parser.add_argument('--day', '--daily',
@@ -250,6 +258,7 @@ def main(argv):
             col_count=cfg['col_count'],
             filter_names=cfg['filter_names'],
         )
+        tbl.table_name = cfg['tbl_name']
         tbl.left_label = cfg['left_label']
         tablelist.append(tbl)
 
