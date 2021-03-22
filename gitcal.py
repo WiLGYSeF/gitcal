@@ -21,7 +21,7 @@ def getval(tbl, val):
     if tbl.config['print_num']:
         celldata = '%2d' % val
         if len(celldata) > 2:
-            celldata = '##'
+            celldata = '#^'
 
     if val == 0:
         return '\x1b[100m  \x1b[0m'
