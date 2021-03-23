@@ -8,6 +8,7 @@ def create_table_from_commits(cell_info, commits, **kwargs):
     col_count = kwargs.get('col_count', 7)
     make_labels = kwargs.get('make_labels', True)
     labels_inclusive = kwargs.get('labels_inclusive', True)
+    long_labels = kwargs.get('long_labels', True)
 
     delta = kwargs.get('delta', datetime.timedelta(days=1))
     start_date = kwargs.get('start_date')
@@ -32,7 +33,11 @@ def create_table_from_commits(cell_info, commits, **kwargs):
     first_date = commits[start_idx]['datetime']
     curdate = datetime.datetime(first_date.year, first_date.month, first_date.day)
     if make_labels:
-        labels.append(shortdate(curdate, delta))
+        labels.append(shortdate(
+            curdate,
+            delta,
+            include_year=long_labels,
+        ))
     curdate += delta
 
     def append(val):
@@ -47,9 +52,14 @@ def create_table_from_commits(cell_info, commits, **kwargs):
             if make_labels:
                 labels[-1] += ' - %s' % shortdate(
                     (curdate - delta) if labels_inclusive else curdate,
-                    delta
+                    delta,
+                    include_year=long_labels,
                 )
-                labels.append(shortdate(curdate, delta))
+                labels.append(shortdate(
+                    curdate,
+                    delta,
+                    include_year=long_labels,
+                ))
 
         curdate += delta
 
@@ -89,11 +99,15 @@ def create_table_from_commits(cell_info, commits, **kwargs):
 
     return tbl
 
-def shortdate(dtime, delta):
+def shortdate(dtime, delta, include_year=True):
     if delta.seconds % 86400 == 0:
-        return '%04d-%02d-%02d' % (dtime.year, dtime.month, dtime.day)
+        if include_year:
+            return '%04d-%02d-%02d' % (dtime.year, dtime.month, dtime.day)
+        return '%02d-%02d' % (dtime.month, dtime.day)
     if delta.seconds % 3600 == 0:
-        return '%04d-%02d-%02d %02dh' % (dtime.year, dtime.month, dtime.day, dtime.hour)
+        if include_year:
+            return '%04d-%02d-%02d %02dh' % (dtime.year, dtime.month, dtime.day, dtime.hour)
+        return '%02d-%02d %02dh' % (dtime.month, dtime.day, dtime.hour)
     return str(dtime)
 
 def get_commit_data():

@@ -73,6 +73,7 @@ def main(argv):
             col_count=cfg['col_count'],
             make_labels=cfg['make_labels'],
             labels_inclusive=cfg['labels_inclusive'],
+            long_labels=cfg['long_labels'],
             delta=cfg['delta'],
             filter_names=cfg['filter_names'],
         )

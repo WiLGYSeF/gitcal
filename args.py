@@ -53,6 +53,7 @@ def table_config_from_namespace(namespace):
         'label_sep': namespace.label_sep,
         'make_labels': namespace.make_labels,
         'labels_inclusive': namespace.labels_inclusive,
+        'long_labels': namespace.long_labels,
 
         'threshold': namespace.threshold,
         'print_num': namespace.print_num,
@@ -151,6 +152,14 @@ def parse_args(argv):
     parser.add_argument('--labels-not-inclusive',
         dest='labels_inclusive', action='store_false',
         help='the end label range is not inclusive'
+    )
+    parser.add_argument('--long-labels',
+        action='store_true', default=True,
+        help='use full datetimes for label ranges (default is long)'
+    )
+    parser.add_argument('--short-labels',
+        dest='long_labels', action='store_false',
+        help='use shortened datetimes for label ranges (default is long)'
     )
 
     parser.add_argument('--threshold',
