@@ -83,6 +83,8 @@ def main(argv):
             labels_inclusive=cfg['label_inclusive'],
             long_labels=cfg['long_label'],
             delta=cfg['delta'],
+            start_date=cfg['start'],
+            end_date=cfg['end'],
             filter_names=cfg['filter_names'],
         )
         setattr(tbl, 'config', cfg)

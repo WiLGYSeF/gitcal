@@ -40,14 +40,31 @@ def table_config_from_namespace(namespace):
     else:
         col = int(col)
 
+    start = None
+    if namespace.start is not None:
+        try:
+            start = datetime.datetime.strptime(namespace.start, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            start = datetime.datetime.strptime(namespace.start, '%Y-%m-%d')
+    end = None
+    if namespace.end is not None:
+        try:
+            end = datetime.datetime.strptime(namespace.end, '%Y-%m-%d %H:%M:%S')
+        except ValueError:
+            end = datetime.datetime.strptime(namespace.end, '%Y-%m-%d')
+
     filter_names = namespace.filter
     namespace.filter = []
 
     return {
         'tbl_name': tbl_name,
         'color': namespace.color,
-        'col': col,
         'border': namespace.border,
+        'col': col,
+        'delta': delta,
+        'filter_names': filter_names,
+        'start': start,
+        'end': end,
 
         'left_label': namespace.left_label,
         'label_sep': namespace.label_sep,
@@ -57,9 +74,6 @@ def table_config_from_namespace(namespace):
 
         'threshold': namespace.threshold,
         'num': namespace.num,
-
-        'delta': delta,
-        'filter_names': filter_names,
     }
 
 def guess_col_count(delta, min_col=4, max_col=12):
@@ -131,6 +145,14 @@ def parse_args(argv):
     group.add_argument('--filter',
         action='append',
         help='adds a git username to filter for in the table entries, resets after each --table'
+    )
+    group.add_argument('--start',
+        action='store', metavar='DATE',
+        help='starts the table after date (%Y-%m-%d %H:%M:%S format)'
+    )
+    group.add_argument('--end',
+        action='store', metavar='DATE',
+        help='ends the table after date (%Y-%m-%d %H:%M:%S format)'
     )
     group.add_argument('--table',
         action=TableAction, nargs=0,
