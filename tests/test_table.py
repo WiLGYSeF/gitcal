@@ -149,7 +149,7 @@ class TableTest(unittest.TestCase):
         else:
             output = tables.draw_table()
 
-        if kwargs.get('print_output', False):
+        if kwargs.get('print_output', False): #pragma: nocover
             print(output)
 
         with open(fname, 'r') as outfile:
