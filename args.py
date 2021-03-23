@@ -8,7 +8,7 @@ class ColAction(argparse.Action):
         val = values
 
         if val.lower() == 'guess':
-            setattr(namespace, 'col', val)
+            setattr(namespace, 'col', 'guess')
             return
 
         try:

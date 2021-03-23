@@ -46,7 +46,46 @@ class GitcalTest(unittest.TestCase):
 
     def test_draw_tables_col_fail(self):
         with self.assertRaises(ValueError):
-            self.assert_draw_tables('git-log', ['-c', 'asdf'], print_output=True)
+            self.assert_draw_tables('git-log', ['-c', 'asdf'])
+
+    def test_draw_tables_delta_1h(self):
+        self.assert_draw_tables('git-log', ['-d', '1h'])
+
+    def test_draw_tables_delta_2h(self):
+        self.assert_draw_tables('git-log', ['-d', '2h'])
+
+    def test_draw_tables_delta_3h(self):
+        self.assert_draw_tables('git-log', ['-d', '3h'])
+
+    def test_draw_tables_delta_4h(self):
+        self.assert_draw_tables('git-log', ['-d', '4h'])
+
+    def test_draw_tables_delta_9h(self):
+        self.assert_draw_tables('git-log', ['-d', '9h'])
+
+    def test_draw_tables_delta_1h_24col(self):
+        self.assert_draw_tables('git-log', ['-d', '1h', '-c', '24'])
+
+    def test_draw_tables_delta_2(self):
+        self.assert_draw_tables('git-log', ['-d', '2'])
+
+    def test_draw_tables_delta_2d(self):
+        self.assert_draw_tables('git-log', ['-d', '2d'])
+
+    def test_draw_tables_delta_2day(self):
+        self.assert_draw_tables('git-log', ['-d', '2day'])
+
+    def test_draw_tables_delta_2days(self):
+        self.assert_draw_tables('git-log', ['-d', '2 days'])
+
+    def test_draw_tables_delta_30m(self):
+        self.assert_draw_tables('git-log', ['-d', '30m'])
+
+    def test_draw_tables_delta_fail(self):
+        with self.assertRaises(ValueError):
+            self.assert_draw_tables('git-log', ['-d', 'asdf'])
+        with self.assertRaises(ValueError):
+            self.assert_draw_tables('git-log', ['-d', '1h 30m'])
 
     def test_draw_cell_bordered(self):
         for i in range(5):
