@@ -27,6 +27,15 @@ class TableTest(unittest.TestCase):
     def test_6x4a_label_table(self):
         self.assert_from_file('6x4a-label')
 
+    def test_6x4a_label_some_table(self):
+        self.assert_from_file('6x4a-label-some')
+
+    def test_6x4a_label_some_label_left_table(self):
+        self.assert_from_file('6x4a-label-some-label-left')
+
+    def test_6x4a_label_some_label_left_lpad_table(self):
+        self.assert_from_file('6x4a-label-some-label-left-lpad')
+
     def assert_from_file(self, name, print_output=False):
         if print_output: #pragma: no cover
             print()
@@ -38,7 +47,20 @@ class TableTest(unittest.TestCase):
             labels = []
             has_labels = False
 
+            opts = {
+                'label_left': False,
+                'label_lpad': False
+            }
+
             for line in file:
+                if line.startswith('#'):
+                    modifier = line[1:].strip()
+                    if modifier == 'label_left':
+                        opts['label_left'] = True
+                    if modifier == 'label_lpad':
+                        opts['label_lpad'] = True
+                    continue
+
                 match = LABEL_REGEX.match(line)
                 if match is not None:
                     labels.append(match[1])
@@ -56,12 +78,12 @@ class TableTest(unittest.TestCase):
             if not has_labels:
                 labels = None
 
-            with create_table(data, labels=labels, border=True) as tbl:
+            with create_table(data, labels=labels, border=True, **opts) as tbl:
                 if print_output:  #pragma: no cover
                     print(tbl.draw_table())
                 with open(fname + '.border.output', 'r') as outfile:
                     self.line_comparison(tbl.draw_table(), outfile.read())
-            with create_table(data, labels=labels, border=False) as tbl:
+            with create_table(data, labels=labels, border=False, **opts) as tbl:
                 if print_output:  #pragma: no cover
                     print(tbl.draw_table())
                 with open(fname + '.output', 'r') as outfile:
@@ -77,9 +99,14 @@ class TableTest(unittest.TestCase):
             self.assertEqual(alines[i].rstrip(), blines[i].rstrip())
 
 @contextmanager
-def create_table(data, labels=None, border=True):
+def create_table(data, **kwargs):
+    labels = kwargs.get('labels')
+    border = kwargs.get('border', True)
+
     tbl = Table(cell_bordered if border else cell_unborder)
     tbl.data = data
+    tbl.left_label = kwargs.get('label_left', False)
+    tbl.label_lpad = kwargs.get('label_lpad', False)
 
     if labels is not None:
         tbl.row_labels = labels
