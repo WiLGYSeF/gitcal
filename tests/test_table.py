@@ -1,14 +1,36 @@
 from contextlib import contextmanager
+import os
 import unittest
 
 from table import Table, CellInfo
 
 
+TABLES_DIR = os.path.join(os.path.dirname(__file__), 'tables')
+
+
 class TableTest(unittest.TestCase):
     def test_empty_table(self):
-        with create_table([[]]) as tbl:
-            self.assertEqual(tbl.draw_table(), '')
+        self.assert_from_file('empty')
 
+    def test_2x2a_table(self):
+        self.assert_from_file('2x2a')
+
+    def assert_from_file(self, name):
+        fname = os.path.join(TABLES_DIR, name + '.txt')
+        with open(fname, 'r') as file:
+            data = list(map(
+                lambda x: list(map(
+                    lambda y: int(y),
+                    x.split(',')
+                )),
+                file.readlines()
+            ))
+            with create_table(data, border=True) as tbl:
+                with open(fname + '.border.output', 'r') as outfile:
+                    self.assertEqual(tbl.draw_table(), outfile.read())
+            with create_table(data, border=False) as tbl:
+                with open(fname + '.output', 'r') as outfile:
+                    self.assertEqual(tbl.draw_table(), outfile.read())
 
 @contextmanager
 def create_table(data, border=True):
@@ -27,8 +49,8 @@ def draw_cell_unborder(val):
 
 def getval(tbl, val, col=-1, row=-1):
     if val == 0:
-        return '.'
-    return '#'
+        return '..'
+    return '%2d' % val
 
 cell_bordered = CellInfo(
     width=4,
