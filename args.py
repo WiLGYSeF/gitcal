@@ -138,7 +138,7 @@ def parse_args(argv):
         action='store_true', default=True,
         help='removes the cell borders from the output (default)'
     )
-    group.add_argument('--no-border',
+    group.add_argument('-B', '--no-border',
         dest='border', action='store_false', default=False,
         help='removes the cell borders from the output'
     )
