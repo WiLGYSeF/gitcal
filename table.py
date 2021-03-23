@@ -27,7 +27,7 @@ class Table:
         return '\n'.join(self.draw_row_iter(row, row_idx))
 
     def draw_row_iter(self, row, row_idx=-1):
-        gen_list = [ self.draw_cell_iter(row[i]) for i in range(len(row)) ]
+        gen_list = [ self.draw_cell_iter(row[i], col=i, row=row_idx) for i in range(len(row)) ]
 
         has_labels = self.has_labels()
         longest_label = self.longest_label_length()
@@ -72,8 +72,15 @@ class Table:
             yield chars
             first_line = False
 
-    def draw_cell_iter(self, val):
-        for res in self.cell_info.fnc_draw_cell(self.cell_info.fnc_getval(self, val)):
+    def draw_cell_iter(self, val, col=-1, row=-1):
+        for res in self.cell_info.fnc_draw_cell(
+            self.cell_info.fnc_getval(
+                self,
+                val,
+                col=col,
+                row=row
+            )
+        ):
             yield res
 
     def get_row_label(self, row_idx):

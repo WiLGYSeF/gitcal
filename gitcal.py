@@ -17,15 +17,19 @@ def draw_cell_bordered(val):
 def draw_cell_unborder(val):
     yield val
 
-def getval(tbl, val):
+def getval(tbl, val, col=-1, row=-1):
+    if val == 0:
+        return '\x1b[100m  \x1b[0m'
+
     celldata = '  '
     if tbl.config['print_num']:
         celldata = '%2d' % val
         if len(celldata) > 2:
             celldata = '#^'
 
-    if val == 0:
-        return '\x1b[100m  \x1b[0m'
+        if col >= 0 and (col & 1) == 1:
+            celldata = '\x1b[4m%s\x1b[24m' % celldata
+
     if tbl.config['threshold'] > val:
         return '\x1b[102m%s\x1b[0m' % celldata
     return '\x1b[42m%s\x1b[0m' % celldata
