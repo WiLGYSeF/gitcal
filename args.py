@@ -99,99 +99,98 @@ def parse_args(argv):
         description='Show git commits in a visual calendar-like format'
     )
 
-    parser.add_argument('--tbl-name',
-        action='store',
-        help='sets the current table name. resets after each --table'
+    group = parser.add_argument_group('table options')
+    group.add_argument('--tbl-name',
+        action='store', metavar='NAME',
+        help='sets the current table name, resets after each --table'
     )
-    parser.add_argument('--color',
+    group.add_argument('--color',
         action='store_true', default=True,
-        help='display the table in color (default is colored)'
+        help='display the table in color (default)'
     )
-    parser.add_argument('--no-color',
+    group.add_argument('--no-color',
         dest='color', action='store_false',
-        help='do not display the table in color (default is colored)'
+        help='do not display the table in color'
     )
-    parser.add_argument('-c', '--col',
-        action='store', default=None,
+    group.add_argument('-b', '--border',
+        action='store_true', default=True,
+        help='removes the cell borders from the output (default)'
+    )
+    group.add_argument('--no-border',
+        dest='border', action='store_false', default=False,
+        help='removes the cell borders from the output'
+    )
+    group.add_argument('-c', '--col',
+        action='store', metavar='NUM', default=None,
         help='sets the column count (default is "guess" based on the --delta value)'
     )
-
-    parser.add_argument('-b', '--border',
-        action='store_true', default=True,
-        help='removes the cell borders from the output (default is bordered)'
+    group.add_argument('--delta',
+        action=DeltaAction, metavar='TIME',
+        help='sets the delta value of each cell (default 1 day), time can be given in #d, #h, or #m (e.g. 4h)'
     )
-    parser.add_argument('--no-border',
-        dest='border', action='store_false', default=False,
-        help='removes the cell borders from the output (default is bordered)'
-    )
-
-    parser.add_argument('--left-label',
-        action='store_true', default=True,
-        help='display labels on the left-hand side (default is left-hand side)'
-    )
-    parser.add_argument('--right-label',
-        dest='left_label', action='store_true', default=False,
-        help='display labels on the right-hand side (default is left-hand side)'
-    )
-    parser.add_argument('--label-sep',
-        action='store', default=' ' * 2,
-        help='set the string used to separate the table and labels'
-    )
-    parser.add_argument('--label',
-        action='store_true', default=True,
-        help='make labels for the table rows (default is true)'
-    )
-    parser.add_argument('--no-label',
-        dest='make_labels', action='store_false',
-        help='do not make labels for the table rows (default is true)'
-    )
-    parser.add_argument('--label-inclusive',
-        action='store_true', default=True,
-        help='the end label range is inclusive'
-    )
-    parser.add_argument('--label-noninclusive',
-        dest='label_inclusive', action='store_false',
-        help='the end label range is not inclusive'
-    )
-    parser.add_argument('--long-label',
-        action='store_true', default=True,
-        help='use full datetimes for label ranges (default is long)'
-    )
-    parser.add_argument('--short-label',
-        dest='long_label', action='store_false',
-        help='use shortened datetimes for label ranges (default is long)'
-    )
-
-    parser.add_argument('-t', '--threshold',
-        action='store', type=int, default=0,
-        help='set the threshold value where the cell value is no longer considered small (default is 0)'
-    )
-    parser.add_argument('--num',
-        action='store_true', default=False,
-        help='prints the commit counts in the cells (default is false)'
-    )
-    parser.add_argument('--no-num',
-        dest='num', action='store_false',
-        help='do not print the commit counts in the cells (default is false)'
-    )
-
-    parser.add_argument('--delta',
-        action=DeltaAction,
-        help='sets the delta value of each cell (default is 1 day)'
-    )
-
-    parser.add_argument('--filter',
+    group.add_argument('--filter',
         action='append',
-        help='adds a git username to filter for in the table entries. resets after each --table'
+        help='adds a git username to filter for in the table entries, resets after each --table'
     )
-
-    parser.add_argument('--table',
+    group.add_argument('--table',
         action=TableAction, nargs=0,
         help='creates a new table to display alongside the others, all table options are applied to the previous table'
     )
-    parser.add_argument('--spacing',
-        action='store', type=int, default=2,
-        help='change the spacing between tables (default is 2)'
+    group.add_argument('--spacing',
+        action='store', type=int, metavar='NUM', default=2,
+        help='change the spacing between tables (default 2)'
+    )
+
+    group = parser.add_argument_group('label options')
+    group.add_argument('--left-label',
+        action='store_true', default=True,
+        help='display labels on the left-hand side (default)'
+    )
+    group.add_argument('--right-label',
+        dest='left_label', action='store_true', default=False,
+        help='display labels on the right-hand side'
+    )
+    group.add_argument('--label-sep',
+        action='store', metavar='STRING', default=' ' * 2,
+        help='set the string used to separate the table and labels (default "  ")'
+    )
+    group.add_argument('--label',
+        action='store_true', default=True,
+        help='show labels for the table rows (default)'
+    )
+    group.add_argument('--no-label',
+        dest='label', action='store_false',
+        help='show labels for the table rows'
+    )
+    group.add_argument('--label-inclusive',
+        action='store_true', default=True,
+        help='the end label range is inclusive (default)'
+    )
+    group.add_argument('--label-noninclusive',
+        dest='label_inclusive', action='store_false',
+        help='the end label range is not inclusive'
+    )
+    group.add_argument('--long-label',
+        action='store_true', default=True,
+        help='use full datetimes for label ranges (default)'
+    )
+    group.add_argument('--short-label',
+        dest='long_label', action='store_false',
+        help='use shortened datetimes for label ranges'
+    )
+
+    group = parser.add_argument_group('cell options')
+    group.add_argument('-t', '--threshold',
+        action='store', type=int, metavar='NUM', default=0,
+        help='set the threshold value where the cell value is no longer considered small (default 0)'
+    )
+    group.add_argument('--num',
+        action='store_true', default=False,
+        help='prints the commit counts in the cells'
+    )
+    group.add_argument('--no-num',
+        dest='num', action='store_false',
+        help='do not print the commit counts in the cells (default)'
     )
 
     return parser.parse_args(argv), table_configs
