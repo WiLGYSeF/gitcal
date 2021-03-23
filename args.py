@@ -146,11 +146,11 @@ def parse_args(argv):
         action='store', metavar='NUM', default=None,
         help='sets the column count (default is "guess" based on the --delta value)'
     )
-    group.add_argument('--delta',
+    group.add_argument('-d', '--delta',
         action=DeltaAction, metavar='TIME',
         help='sets the delta value of each cell (default 1 day), time can be given in #d, #h, or #m (e.g. 4h)'
     )
-    group.add_argument('--filter',
+    group.add_argument('-f', '--filter',
         action='append',
         help='adds a git username to filter for in the table entries, resets after each --table'
     )
@@ -162,7 +162,7 @@ def parse_args(argv):
         action='store', metavar='DATE',
         help='ends the table after date (%Y-%m-%d %H:%M:%S format)'
     )
-    group.add_argument('--table',
+    group.add_argument('-T', '--table',
         action=TableAction, nargs=0,
         help='creates a new table to display alongside the others, all table options are applied to the previous table'
     )
