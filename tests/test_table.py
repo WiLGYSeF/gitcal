@@ -35,24 +35,42 @@ class TableTest(unittest.TestCase):
     def test_6x4a_label_some_label_left_lpad_table(self):
         self.assert_from_file('6x4a-label-some-label-left-lpad')
 
-    def assert_from_file(self, name, print_output=False):
-        if print_output: #pragma: no cover
+    def test_2x2a_4x3a_6x4a_tables(self):
+        pass
+
+    def assert_from_file(self, names, **kwargs):
+        if kwargs.get('print_output', False): #pragma: no cover
             print()
-            print(name)
+            print(names)
 
-        fname = os.path.join(TABLES_DIR, name + '.txt')
+        if not isinstance(names, list):
+            names = [ names ]
 
-        tbl = create_table_from_file(fname, border=True)
-        if print_output: #pragma: no cover
-            print(tbl.draw_table())
-        with open(fname + '.border.output', 'r') as outfile:
-            self.line_comparison(tbl.draw_table(), outfile.read())
+        tables = []
+        for tblname in names:
+            fname = os.path.join(TABLES_DIR, tblname + '.txt')
+            tables.append(create_table_from_file(fname, border=True))
 
-        tbl = create_table_from_file(fname, border=False)
-        if print_output: #pragma: no cover
-            print(tbl.draw_table())
-        with open(fname + '.output', 'r') as outfile:
-            self.line_comparison(tbl.draw_table(), outfile.read())
+        fname = os.path.join(TABLES_DIR, ','.join(names) + '.txt.border.output')
+        self.assert_file(fname, tables, **kwargs)
+
+        for tbl in tables:
+            tbl.cell_info = cell_unborder
+
+        fname = os.path.join(TABLES_DIR, ','.join(names) + '.txt.output')
+        self.assert_file(fname, tables, **kwargs)
+
+    def assert_file(self, fname, tables, **kwargs):
+        if isinstance(tables, list):
+            output = Table.draw_tables(tables)
+        else:
+            output = tables.draw_table()
+
+        if kwargs.get('print_output', False):
+            print(output)
+
+        with open(fname, 'r') as outfile:
+            self.line_comparison(output, outfile.read())
 
     def line_comparison(self, first, second):
         alines = first.split('\n')
