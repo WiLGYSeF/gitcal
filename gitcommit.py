@@ -15,7 +15,9 @@ def create_table_from_commits(cell_info, commits, **kwargs):
     end_date = kwargs.get('end_date')
 
     filter_names = kwargs.get('filter_names')
-    if filter_names is not None and not isinstance(filter_names, list):
+    if filter_names is None:
+        filter_names = []
+    if not isinstance(filter_names, list):
         filter_names = [ filter_names ]
 
     tbl = Table(cell_info)
@@ -69,7 +71,7 @@ def create_table_from_commits(cell_info, commits, **kwargs):
             continue
         if end_date is not None and commit['datetime'] > end_date:
             break
-        if filter_names is not None and commit['name'] not in filter_names:
+        if len(filter_names) != 0 and commit['name'] not in filter_names:
             continue
 
         if curdate < commit['datetime']:

@@ -215,4 +215,5 @@ def parse_args(argv):
         help='do not print the commit counts in the cells (default)'
     )
 
-    return parser.parse_args(argv), table_configs
+    argspace = parser.parse_args(argv)
+    return argspace, table_configs
