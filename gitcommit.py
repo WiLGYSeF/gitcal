@@ -97,7 +97,7 @@ def create_table_from_commits(cell_info, commits, **kwargs):
 
     tbl.set_table_data(data)
     if make_labels:
-        tbl.row_labels = labels
+        tbl.set_row_labels(labels)
 
     return tbl
 

@@ -10,8 +10,14 @@ class Table:
         self.label_lpad = True
         self.left_label = False
 
+        self._longest_label_length = 0
+
     def set_table_data(self, data):
         self.data = data
+
+    def set_row_labels(self, labels):
+        self.row_labels = labels
+        self._longest_label_length = self._get_longest_label_length()
 
     def draw_table(self):
         return Table.draw_tables( (self,) )
@@ -30,7 +36,6 @@ class Table:
         gen_list = [ self.draw_cell_iter(row[i], col=i, row=row_idx) for i in range(len(row)) ]
 
         has_labels = self.has_labels()
-        longest_label = self.longest_label_length()
         did_label = False
         first_line = True
 
@@ -60,9 +65,9 @@ class Table:
                     label = ''
 
                 if self.label_lpad:
-                    label = ' '  * (longest_label - len(label)) + label
+                    label = ' '  * (self.longest_label_length - len(label)) + label
                 else:
-                    label += ' '  * (longest_label - len(label))
+                    label += ' '  * (self.longest_label_length - len(label))
 
                 if self.left_label:
                     chars = '%s%s%s' % (label, self.label_sep, chars)
@@ -101,10 +106,14 @@ class Table:
             length = len(self.table_name)
 
         if include_label and self.has_labels():
-            length += len(self.label_sep) + self.longest_label_length()
+            length += len(self.label_sep) + self.longest_label_length
         return length
 
+    @property
     def longest_label_length(self):
+        return self._longest_label_length
+
+    def _get_longest_label_length(self):
         val_list = self.row_labels
         if isinstance(self.row_labels, dict):
             val_list = self.row_labels.values()
@@ -151,13 +160,13 @@ class Table:
                     continue
 
                 if tbl.has_labels() and tbl.left_label:
-                    result += ' ' * (tbl.longest_label_length() + len(tbl.label_sep))
+                    result += ' ' * (tbl.longest_label_length + len(tbl.label_sep))
 
                 result += tbl.table_name
                 result += ' ' * (tbl.max_length(include_label=False) - len(tbl.table_name))
 
                 if tbl.has_labels() and not tbl.left_label:
-                    result += ' ' * (tbl.longest_label_length() + len(tbl.label_sep))
+                    result += ' ' * (tbl.longest_label_length + len(tbl.label_sep))
 
                 result += ' ' * spacing
             result += '\n'
