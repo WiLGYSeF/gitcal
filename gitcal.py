@@ -30,8 +30,9 @@ def getval(tbl, val, col=-1, row=-1):
         if len(celldata) > 2:
             celldata = '#^'
 
-        if tbl.config['color'] and col >= 0 and (col & 1) == 1:
-            celldata = '\x1b[4m%s\x1b[24m' % celldata
+        if tbl.config['color'] and col != -1 and row != -1 and (col & 1) == 1:
+            if is_val_touching_adjacent(tbl, val, col, row):
+                celldata = '\x1b[4m%s\x1b[24m' % celldata
 
     if not tbl.config['color']:
         if tbl.config['print_num']:
@@ -41,6 +42,13 @@ def getval(tbl, val, col=-1, row=-1):
     if val < tbl.config['threshold']:
         return '\x1b[30;43m%s\x1b[39;49m' % celldata
     return '\x1b[30;42m%s\x1b[39;49m' % celldata
+
+def is_val_touching_adjacent(tbl, val, col, row):
+    return (
+        val > 9 and col > 0 and tbl.data[row][col - 1] != 0
+    ) or (
+        col < len(tbl.data[row]) - 1 and tbl.data[row][col + 1] > 9
+    )
 
 def main(argv):
     argspace, table_configs = parse_args(argv)
