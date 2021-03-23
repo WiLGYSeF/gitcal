@@ -18,6 +18,9 @@ class GitcalTest(unittest.TestCase):
     def test_draw_tables_name(self):
         self.assert_draw_tables('git-log', ['--tbl-name', 'here is a name'])
 
+    def test_draw_tables_one_name(self):
+        self.assert_draw_tables('git-log', ['--tbl-name', 'master', '-T'])
+
     def test_draw_tables_name_long(self):
         self.assert_draw_tables('git-log', [
             '--tbl-name', 'here is a much longer name that is longer than the table'
@@ -86,6 +89,31 @@ class GitcalTest(unittest.TestCase):
             self.assert_draw_tables('git-log', ['-d', 'asdf'])
         with self.assertRaises(ValueError):
             self.assert_draw_tables('git-log', ['-d', '1h 30m'])
+
+    def test_draw_tables_filter_wilgysef(self):
+        self.assert_draw_tables('git-log-multi', ['-f', 'WiLGYSeF'])
+
+    def test_draw_tables_filter_aaasdf(self):
+        self.assert_draw_tables('git-log-multi', ['-f', 'aaasdf'])
+
+    def test_draw_tables_filter_total_wilgysef_aaasdf(self):
+        self.assert_draw_tables('git-log-multi', [
+            '-T',
+            '-f', 'WiLGYSeF',
+            '-T',
+            '-f', 'aaasdf'
+        ])
+
+    def test_draw_tables_filter_total_wilgysef_aaasdf_named(self):
+        self.assert_draw_tables('git-log-multi', [
+            '--tbl-name', 'total',
+            '-T',
+            '--tbl-name', 'WiLGYSeF',
+            '-f', 'WiLGYSeF',
+            '-T',
+            '--tbl-name', 'aaasdf',
+            '-f', 'aaasdf'
+        ])
 
     def test_draw_cell_bordered(self):
         for i in range(5):
