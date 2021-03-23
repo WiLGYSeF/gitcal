@@ -15,7 +15,17 @@ class TableTest(unittest.TestCase):
     def test_2x2a_table(self):
         self.assert_from_file('2x2a')
 
-    def assert_from_file(self, name):
+    def test_2x2b_table(self):
+        self.assert_from_file('2x2b')
+
+    def test_6x4a_table(self):
+        self.assert_from_file('6x4a')
+
+    def assert_from_file(self, name, print_output=False):
+        if print_output: #pragma: no cover
+            print()
+            print(name)
+
         fname = os.path.join(TABLES_DIR, name + '.txt')
         with open(fname, 'r') as file:
             data = list(map(
@@ -26,9 +36,13 @@ class TableTest(unittest.TestCase):
                 file.readlines()
             ))
             with create_table(data, border=True) as tbl:
+                if print_output:  #pragma: no cover
+                    print(tbl.draw_table())
                 with open(fname + '.border.output', 'r') as outfile:
                     self.assertEqual(tbl.draw_table(), outfile.read())
             with create_table(data, border=False) as tbl:
+                if print_output:  #pragma: no cover
+                    print(tbl.draw_table())
                 with open(fname + '.output', 'r') as outfile:
                     self.assertEqual(tbl.draw_table(), outfile.read())
 
