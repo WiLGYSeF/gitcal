@@ -38,9 +38,9 @@ def getval(tbl, val, col=-1, row=-1):
             return celldata
         return '##'
 
-    if tbl.config['threshold'] > val:
-        return '\x1b[102m%s\x1b[0m' % celldata
-    return '\x1b[42m%s\x1b[0m' % celldata
+    if val < tbl.config['threshold']:
+        return '\x1b[30;43m%s\x1b[39;49m' % celldata
+    return '\x1b[30;42m%s\x1b[39;49m' % celldata
 
 def main(argv):
     argspace, table_configs = parse_args(argv)
