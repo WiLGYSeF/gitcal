@@ -29,14 +29,14 @@ class TableTest(unittest.TestCase):
     def test_6x4a_label_some_table(self):
         self.assert_from_file('6x4a-label-some')
 
-    def test_6x4a_label_some_label_lpad_table(self):
-        self.assert_from_file('6x4a-label-some-label-lpad', print_output=True)
+    def test_6x4a_label_some_lpad_table(self):
+        self.assert_from_file('6x4a-label-some-lpad')
 
-    def test_6x4a_label_some_label_left_table(self):
-        self.assert_from_file('6x4a-label-some-label-left')
+    def test_6x4a_label_some_left_table(self):
+        self.assert_from_file('6x4a-label-some-left')
 
-    def test_6x4a_label_some_label_left_lpad_table(self):
-        self.assert_from_file('6x4a-label-some-label-left-lpad')
+    def test_6x4a_label_some_left_lpad_table(self):
+        self.assert_from_file('6x4a-label-some-left-lpad')
 
     def test_6x4a_name_label_some_table(self):
         self.assert_from_file('6x4a-name-label-some')
@@ -72,7 +72,7 @@ class TableTest(unittest.TestCase):
         self.assert_from_file([
             '2x2a',
             '4x3a-label',
-            '6x4a-label-some-label-left',
+            '6x4a-label-some-left',
         ])
 
     def test_4x3a_2x2a_6x4a_labels_tables(self):
@@ -85,7 +85,7 @@ class TableTest(unittest.TestCase):
         self.assert_from_file([
             '4x3a-label',
             '2x2a',
-            '6x4a-label-some-label-left',
+            '6x4a-label-some-left',
         ])
 
     def test_4x3a_6x4a_with_name_and_labels(self):
@@ -116,7 +116,7 @@ class TableTest(unittest.TestCase):
         ])
 
         self.assert_from_file([
-            '6x4a-name-label-some-label-left',
+            '6x4a-name-label-some-left',
             '4x3a-name-label',
             '2x2a',
         ])
