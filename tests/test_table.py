@@ -23,6 +23,14 @@ class TableTest(unittest.TestCase):
     def test_6x4a_table(self):
         self.assert_from_file('6x4a')
 
+    def test_6x4a_table_max_length(self):
+        fname = os.path.join(TABLES_DIR, '6x4a' + '.txt')
+        tbl = create_table_from_file(fname, border=True)
+        self.assertEqual(tbl.max_length(), 13)
+
+        tbl = create_table_from_file(fname, border=False)
+        self.assertEqual(tbl.max_length(), 8)
+
     def test_6x4a_label_table(self):
         self.assert_from_file('6x4a-label')
 
@@ -35,11 +43,35 @@ class TableTest(unittest.TestCase):
     def test_6x4a_label_some_left_table(self):
         self.assert_from_file('6x4a-label-some-left')
 
+    def test_6x4a_lable_some_left_table_max_length(self):
+        fname = os.path.join(TABLES_DIR, '6x4a-label-some-left' + '.txt')
+        tbl = create_table_from_file(fname, border=True)
+        self.assertEqual(tbl.max_length(), 18)
+
+        tbl = create_table_from_file(fname, border=False)
+        self.assertEqual(tbl.max_length(), 13)
+
     def test_6x4a_label_some_left_lpad_table(self):
         self.assert_from_file('6x4a-label-some-left-lpad')
 
     def test_6x4a_name_label_some_table(self):
         self.assert_from_file('6x4a-name-label-some')
+
+    def test_6x4a_name_label_some_table_max_length(self):
+        fname = os.path.join(TABLES_DIR, '6x4a-name-label-some' + '.txt')
+        tbl = create_table_from_file(fname, border=True)
+        self.assertEqual(tbl.max_length(), 29)
+
+        tbl = create_table_from_file(fname, border=False)
+        self.assertEqual(tbl.max_length(), 29)
+
+    def test_6x4a_name_label_some_left_table_max_length(self):
+        fname = os.path.join(TABLES_DIR, '6x4a-name-label-some-left' + '.txt')
+        tbl = create_table_from_file(fname, border=True)
+        self.assertEqual(tbl.max_length(), 39)
+
+        tbl = create_table_from_file(fname, border=False)
+        self.assertEqual(tbl.max_length(), 39)
 
     def test_2x2a_4x3a_6x4a_tables(self):
         self.assert_from_file([
