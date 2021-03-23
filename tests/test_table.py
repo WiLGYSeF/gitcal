@@ -40,7 +40,21 @@ class TableTest(unittest.TestCase):
             '2x2a',
             '4x3a',
             '6x4a',
-        ], print_output=True)
+        ])
+
+    def test_4x3a_2x2a_6x4a_tables(self):
+        self.assert_from_file([
+            '4x3a',
+            '2x2a',
+            '6x4a',
+        ])
+
+    def test_6x4a_4x3a_2x2a_tables(self):
+        self.assert_from_file([
+            '6x4a',
+            '4x3a',
+            '2x2a',
+        ])
 
     def assert_from_file(self, names, **kwargs):
         if kwargs.get('print_output', False): #pragma: no cover
