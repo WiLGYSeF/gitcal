@@ -5,19 +5,25 @@ class Table:
 
         self.table_name = None
 
-        self.row_labels = {}
         self.label_sep = '  '
         self.label_lpad = True
         self.left_label = False
 
+        self._row_labels = {}
         self._longest_label_length = 0
 
-    def set_table_data(self, data):
-        self.data = data
+    @property
+    def row_labels(self):
+        return self._row_labels
 
-    def set_row_labels(self, labels):
-        self.row_labels = labels
+    @row_labels.setter
+    def row_labels(self, value):
+        self._row_labels = value
         self._longest_label_length = self._get_longest_label_length()
+
+    @property
+    def longest_label_length(self):
+        return self._longest_label_length
 
     def draw_table(self):
         return Table.draw_tables( (self,) )
@@ -108,10 +114,6 @@ class Table:
         if include_label and self.has_labels():
             length += len(self.label_sep) + self.longest_label_length
         return length
-
-    @property
-    def longest_label_length(self):
-        return self._longest_label_length
 
     def _get_longest_label_length(self):
         val_list = self.row_labels
