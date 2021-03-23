@@ -10,10 +10,13 @@ LOG_DIR = os.path.join(os.path.dirname(__file__), 'mocked_data')
 
 class GitcalTest(unittest.TestCase):
     def test_draw_tables(self):
-        self.assert_draw_tables('git-log', [], print_output=True, write_output=True)
+        self.assert_draw_tables('git-log', [])
+
+    def test_draw_tables_no_color(self):
+        self.assert_draw_tables('git-log', ['--no-color'])
 
     def test_draw_tables_two(self):
-        self.assert_draw_tables('git-log', ['--table'], print_output=True, write_output=True)
+        self.assert_draw_tables('git-log', ['--table'])
 
     def test_draw_cell_bordered(self):
         for i in range(5):
