@@ -35,6 +35,9 @@ class TableTest(unittest.TestCase):
     def test_6x4a_label_some_label_left_lpad_table(self):
         self.assert_from_file('6x4a-label-some-label-left-lpad')
 
+    def test_6x4a_name_label_some_table(self):
+        self.assert_from_file('6x4a-name-label-some')
+
     def test_2x2a_4x3a_6x4a_tables(self):
         self.assert_from_file([
             '2x2a',
@@ -80,6 +83,39 @@ class TableTest(unittest.TestCase):
             '4x3a-label',
             '2x2a',
             '6x4a-label-some-label-left',
+        ])
+
+    def test_4x3a_6x4a_with_name_and_labels(self):
+        self.assert_from_file([
+            '4x3a-name-label',
+            '6x4a-name-label-some',
+        ])
+
+    def test_2x2a_4x3a_6x4a_with_name_and_labels(self):
+        self.assert_from_file([
+            '2x2a',
+            '4x3a-name-label',
+            '6x4a-name-label-some',
+        ])
+
+    def test_4x3a_2x2a_6x4a_with_name_and_labels(self):
+        self.assert_from_file([
+            '4x3a-name-label',
+            '2x2a',
+            '6x4a-name-label-some',
+        ])
+
+    def test_6x4a_4x3a_2x2a_with_name_and_labels(self):
+        self.assert_from_file([
+            '6x4a-name-label-some',
+            '4x3a-name-label',
+            '2x2a',
+        ])
+
+        self.assert_from_file([
+            '6x4a-name-label-some-label-left',
+            '4x3a-name-label',
+            '2x2a',
         ])
 
     def assert_from_file(self, names, **kwargs):
@@ -132,6 +168,7 @@ def create_table_from_file(fname, **kwargs):
         has_labels = False
 
         opts = {
+            'name': None,
             'label_left': False,
             'label_lpad': False
         }
@@ -139,9 +176,11 @@ def create_table_from_file(fname, **kwargs):
         for line in file:
             if line.startswith('#'):
                 modifier = line[1:].strip()
-                if modifier == 'label_left':
+                if modifier.startswith('name='):
+                    opts['name'] = modifier.split('=')[1]
+                elif modifier == 'label_left':
                     opts['label_left'] = True
-                if modifier == 'label_lpad':
+                elif modifier == 'label_lpad':
                     opts['label_lpad'] = True
                 continue
 
@@ -169,6 +208,7 @@ def create_table(data, **kwargs):
     border = kwargs.get('border', True)
 
     tbl = Table(cell_bordered if border else cell_unborder)
+    tbl.table_name = kwargs.get('name')
     tbl.data = data
     tbl.left_label = kwargs.get('label_left', False)
     tbl.label_lpad = kwargs.get('label_lpad', False)

@@ -1,0 +1,7 @@
+#name=6x4a table with labels (some)
+     0,1,1,0
+bb:  13,8,2,0
+ccc: 0,0,0,0
+     1,0,4,6
+e:   8,3,6,9
+     0,0,0,0
