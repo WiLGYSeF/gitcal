@@ -25,7 +25,7 @@ def getval(tbl, val, col=-1, row=-1):
         return '  '
 
     celldata = '  '
-    if tbl.config['print_num']:
+    if tbl.config['num']:
         celldata = '%2d' % val
         if len(celldata) > 2:
             celldata = '#^'
@@ -35,7 +35,7 @@ def getval(tbl, val, col=-1, row=-1):
                 celldata = '\x1b[4m%s\x1b[24m' % celldata
 
     if not tbl.config['color']:
-        if tbl.config['print_num']:
+        if tbl.config['num']:
             return celldata
         return '##'
 
@@ -78,10 +78,10 @@ def main(argv):
         tbl = create_table_from_commits(
             cell_bordered if cfg['border'] else cell_unborder,
             commits,
-            col_count=cfg['col_count'],
-            make_labels=cfg['make_labels'],
-            labels_inclusive=cfg['labels_inclusive'],
-            long_labels=cfg['long_labels'],
+            col_count=cfg['col'],
+            make_labels=cfg['label'],
+            labels_inclusive=cfg['label_inclusive'],
+            long_labels=cfg['long_label'],
             delta=cfg['delta'],
             filter_names=cfg['filter_names'],
         )

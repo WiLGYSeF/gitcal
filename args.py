@@ -32,13 +32,13 @@ def table_config_from_namespace(namespace):
     if delta is None:
         delta = datetime.timedelta(days=1)
 
-    col_count = namespace.col_count
-    if col_count is None or col_count.lower() == 'guess':
-        col_count = guess_col_count(delta)
-        if col_count is None:
-            col_count = 10
+    col = namespace.col
+    if col is None or col.lower() == 'guess':
+        col = guess_col_count(delta)
+        if col is None:
+            col = 10
     else:
-        col_count = int(col_count)
+        col = int(col)
 
     filter_names = namespace.filter
     namespace.filter = []
@@ -46,17 +46,17 @@ def table_config_from_namespace(namespace):
     return {
         'tbl_name': tbl_name,
         'color': namespace.color,
-        'col_count': col_count,
+        'col': col,
         'border': namespace.border,
 
         'left_label': namespace.left_label,
         'label_sep': namespace.label_sep,
-        'make_labels': namespace.make_labels,
-        'labels_inclusive': namespace.labels_inclusive,
-        'long_labels': namespace.long_labels,
+        'label': namespace.label,
+        'label_inclusive': namespace.label_inclusive,
+        'long_label': namespace.long_label,
 
         'threshold': namespace.threshold,
-        'print_num': namespace.print_num,
+        'num': namespace.num,
 
         'delta': delta,
         'filter_names': filter_names,
@@ -111,12 +111,12 @@ def parse_args(argv):
         dest='color', action='store_false',
         help='do not display the table in color (default is colored)'
     )
-    parser.add_argument('--col-count',
+    parser.add_argument('-c', '--col',
         action='store', default=None,
         help='sets the column count (default is "guess" based on the --delta value)'
     )
 
-    parser.add_argument('--border',
+    parser.add_argument('-b', '--border',
         action='store_true', default=True,
         help='removes the cell borders from the output (default is bordered)'
     )
@@ -137,41 +137,41 @@ def parse_args(argv):
         action='store', default=' ' * 2,
         help='set the string used to separate the table and labels'
     )
-    parser.add_argument('--make-labels',
+    parser.add_argument('--label',
         action='store_true', default=True,
         help='make labels for the table rows (default is true)'
     )
-    parser.add_argument('--no-make-labels',
+    parser.add_argument('--no-label',
         dest='make_labels', action='store_false',
         help='do not make labels for the table rows (default is true)'
     )
-    parser.add_argument('--labels-inclusive',
+    parser.add_argument('--label-inclusive',
         action='store_true', default=True,
         help='the end label range is inclusive'
     )
-    parser.add_argument('--labels-not-inclusive',
-        dest='labels_inclusive', action='store_false',
+    parser.add_argument('--label-noninclusive',
+        dest='label_inclusive', action='store_false',
         help='the end label range is not inclusive'
     )
-    parser.add_argument('--long-labels',
+    parser.add_argument('--long-label',
         action='store_true', default=True,
         help='use full datetimes for label ranges (default is long)'
     )
-    parser.add_argument('--short-labels',
-        dest='long_labels', action='store_false',
+    parser.add_argument('--short-label',
+        dest='long_label', action='store_false',
         help='use shortened datetimes for label ranges (default is long)'
     )
 
-    parser.add_argument('--threshold',
+    parser.add_argument('-t', '--threshold',
         action='store', type=int, default=0,
         help='set the threshold value where the cell value is no longer considered small (default is 0)'
     )
-    parser.add_argument('--print-num',
+    parser.add_argument('--num',
         action='store_true', default=False,
         help='prints the commit counts in the cells (default is false)'
     )
-    parser.add_argument('--no-print-num',
-        dest='print_num', action='store_false',
+    parser.add_argument('--no-num',
+        dest='num', action='store_false',
         help='do not print the commit counts in the cells (default is false)'
     )
 
