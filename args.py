@@ -64,7 +64,6 @@ def guess_col_count(delta, min_col=4, max_col=12):
     timeframes = [
         60,
         3600,
-        4 * 3600,
         6 * 3600,
         86400,
         7 * 86400,
