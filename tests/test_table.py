@@ -29,6 +29,9 @@ class TableTest(unittest.TestCase):
     def test_6x4a_label_some_table(self):
         self.assert_from_file('6x4a-label-some')
 
+    def test_6x4a_label_some_label_lpad_table(self):
+        self.assert_from_file('6x4a-label-some-label-lpad', print_output=True)
+
     def test_6x4a_label_some_label_left_table(self):
         self.assert_from_file('6x4a-label-some-label-left')
 
