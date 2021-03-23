@@ -86,21 +86,29 @@ def guess_col_count(delta, min_col=4, max_col=12):
         14 * 86400
     ]
 
-    if delta.seconds == 0:
-        return None
+    seconds = delta.days * 86400 + delta.seconds
+    idx = 0
 
     for i in range(len(timeframes)): # pylint: disable=consider-using-enumerate
-        tframe = timeframes[i]
-        if delta.seconds < tframe:
-            count = tframe // delta.seconds
-            if count < min_col:
-                i += 1
-                count = timeframes[i] // delta.seconds
-            if count > max_col and timeframes[i - 1] > delta.seconds:
-                i -= 1
-                count = timeframes[i] // delta.seconds
-            return count
-    return None
+        idx = i
+        if seconds < timeframes[i]:
+            break
+
+    count = timeframes[idx] // seconds
+    checked = set()
+
+    while count < min_col or count > max_col:
+        if count < min_col:
+            idx += 1
+        else:
+            idx -= 1
+
+        if idx == -1 or idx == len(timeframes) or idx in checked:
+            return None
+
+        count = timeframes[idx] // seconds
+        checked.add(idx)
+    return count
 
 def parse_args(argv):
     table_configs = []
