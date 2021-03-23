@@ -12,8 +12,14 @@ class GitcalTest(unittest.TestCase):
     def test_draw_tables(self):
         self.assert_draw_tables('git-log', [])
 
+    def test_draw_tables_no_border(self):
+        self.assert_draw_tables('git-log', ['-B'])
+
     def test_draw_tables_no_color(self):
         self.assert_draw_tables('git-log', ['--no-color'])
+
+    def test_draw_tables_no_border_color(self):
+        self.assert_draw_tables('git-log', ['-B', '--no-color'])
 
     def test_draw_tables_two(self):
         self.assert_draw_tables('git-log', ['--table'])
