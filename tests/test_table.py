@@ -1,4 +1,3 @@
-from contextlib import contextmanager
 import os
 import re
 import unittest
@@ -42,52 +41,18 @@ class TableTest(unittest.TestCase):
             print(name)
 
         fname = os.path.join(TABLES_DIR, name + '.txt')
-        with open(fname, 'r') as file:
-            data = []
-            labels = []
-            has_labels = False
 
-            opts = {
-                'label_left': False,
-                'label_lpad': False
-            }
+        tbl = create_table_from_file(fname, border=True)
+        if print_output: #pragma: no cover
+            print(tbl.draw_table())
+        with open(fname + '.border.output', 'r') as outfile:
+            self.line_comparison(tbl.draw_table(), outfile.read())
 
-            for line in file:
-                if line.startswith('#'):
-                    modifier = line[1:].strip()
-                    if modifier == 'label_left':
-                        opts['label_left'] = True
-                    if modifier == 'label_lpad':
-                        opts['label_lpad'] = True
-                    continue
-
-                match = LABEL_REGEX.match(line)
-                if match is not None:
-                    labels.append(match[1])
-                    has_labels = True
-
-                    line = line[match.end(0):]
-                else:
-                    labels.append('')
-
-                data.append(list(map(
-                    lambda x: int(x),
-                    line.lstrip().split(',')
-                )))
-
-            if not has_labels:
-                labels = None
-
-            with create_table(data, labels=labels, border=True, **opts) as tbl:
-                if print_output:  #pragma: no cover
-                    print(tbl.draw_table())
-                with open(fname + '.border.output', 'r') as outfile:
-                    self.line_comparison(tbl.draw_table(), outfile.read())
-            with create_table(data, labels=labels, border=False, **opts) as tbl:
-                if print_output:  #pragma: no cover
-                    print(tbl.draw_table())
-                with open(fname + '.output', 'r') as outfile:
-                    self.line_comparison(tbl.draw_table(), outfile.read())
+        tbl = create_table_from_file(fname, border=False)
+        if print_output: #pragma: no cover
+            print(tbl.draw_table())
+        with open(fname + '.output', 'r') as outfile:
+            self.line_comparison(tbl.draw_table(), outfile.read())
 
     def line_comparison(self, first, second):
         alines = first.split('\n')
@@ -98,7 +63,45 @@ class TableTest(unittest.TestCase):
         for i in range(len(alines)): #pylint: disable=consider-using-enumerate
             self.assertEqual(alines[i].rstrip(), blines[i].rstrip())
 
-@contextmanager
+def create_table_from_file(fname, **kwargs):
+    with open(fname, 'r') as file:
+        data = []
+        labels = []
+        has_labels = False
+
+        opts = {
+            'label_left': False,
+            'label_lpad': False
+        }
+
+        for line in file:
+            if line.startswith('#'):
+                modifier = line[1:].strip()
+                if modifier == 'label_left':
+                    opts['label_left'] = True
+                if modifier == 'label_lpad':
+                    opts['label_lpad'] = True
+                continue
+
+            match = LABEL_REGEX.match(line)
+            if match is not None:
+                labels.append(match[1])
+                has_labels = True
+
+                line = line[match.end(0):]
+            else:
+                labels.append('')
+
+            data.append(list(map(
+                lambda x: int(x),
+                line.lstrip().split(',')
+            )))
+
+        if not has_labels:
+            labels = None
+
+        return create_table(data, labels=labels, **opts, **kwargs)
+
 def create_table(data, **kwargs):
     labels = kwargs.get('labels')
     border = kwargs.get('border', True)
@@ -111,7 +114,7 @@ def create_table(data, **kwargs):
     if labels is not None:
         tbl.row_labels = labels
 
-    yield tbl
+    return tbl
 
 def draw_cell_bordered(val):
     yield '+--+'
