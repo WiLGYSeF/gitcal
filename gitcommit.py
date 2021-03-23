@@ -122,6 +122,8 @@ def get_commit_data():
 
     for line in output.split(b'\n'):
         line = line.decode('utf-8')
+        if len(line) == 0:
+            continue
 
         spl = line.split(' ')
         shorthash = spl[0]

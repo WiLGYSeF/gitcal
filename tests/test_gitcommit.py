@@ -1,5 +1,8 @@
 import datetime
+import json
+import os
 import unittest
+import unittest.mock as mock
 
 import gitcommit
 
@@ -61,3 +64,15 @@ class GitCommitTest(unittest.TestCase):
                 entry[DELTA],
                 include_year=entry[INCLUDE_YEAR],
             ), entry[RESULT])
+
+    def test_get_commit_data(self):
+        logfile = os.path.join(os.path.dirname(__file__), 'mocked_data/git-log.txt')
+
+        def get_data(args):
+            with open(logfile, 'rb') as file:
+                return file.read()
+
+        with open(logfile + '.output', 'r') as file:
+            with mock.patch('subprocess.check_output', get_data):
+                commits = gitcommit.get_commit_data()
+            self.assertEqual(file.read().rstrip('\n'), str(commits))
