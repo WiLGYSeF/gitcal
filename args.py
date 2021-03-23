@@ -89,7 +89,7 @@ def guess_col_count(delta, min_col=4, max_col=12):
     seconds = delta.days * 86400 + delta.seconds
     idx = 0
 
-    for i in range(len(timeframes)): # pylint: disable=consider-using-enumerate
+    for i in range(len(timeframes)): #pylint: disable=consider-using-enumerate
         idx = i
         if seconds < timeframes[i]:
             break

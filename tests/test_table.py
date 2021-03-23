@@ -1,11 +1,14 @@
 from contextlib import contextmanager
 import os
+import re
 import unittest
 
 from table import Table, CellInfo
 
 
 TABLES_DIR = os.path.join(os.path.dirname(__file__), 'tables')
+
+LABEL_REGEX = re.compile(r'^([A-Za-z0-9 ]+): *')
 
 
 class TableTest(unittest.TestCase):
@@ -21,6 +24,9 @@ class TableTest(unittest.TestCase):
     def test_6x4a_table(self):
         self.assert_from_file('6x4a')
 
+    def test_6x4a_label_table(self):
+        self.assert_from_file('6x4a-label')
+
     def assert_from_file(self, name, print_output=False):
         if print_output: #pragma: no cover
             print()
@@ -28,28 +34,55 @@ class TableTest(unittest.TestCase):
 
         fname = os.path.join(TABLES_DIR, name + '.txt')
         with open(fname, 'r') as file:
-            data = list(map(
-                lambda x: list(map(
-                    lambda y: int(y),
-                    x.split(',')
-                )),
-                file.readlines()
-            ))
-            with create_table(data, border=True) as tbl:
+            data = []
+            labels = []
+            has_labels = False
+
+            for line in file:
+                match = LABEL_REGEX.match(line)
+                if match is not None:
+                    labels.append(match[1])
+                    has_labels = True
+
+                    line = line[match.end(0):]
+                else:
+                    labels.append('')
+
+                data.append(list(map(
+                    lambda x: int(x),
+                    line.lstrip().split(',')
+                )))
+
+            if not has_labels:
+                labels = None
+
+            with create_table(data, labels=labels, border=True) as tbl:
                 if print_output:  #pragma: no cover
                     print(tbl.draw_table())
                 with open(fname + '.border.output', 'r') as outfile:
-                    self.assertEqual(tbl.draw_table(), outfile.read())
-            with create_table(data, border=False) as tbl:
+                    self.line_comparison(tbl.draw_table(), outfile.read())
+            with create_table(data, labels=labels, border=False) as tbl:
                 if print_output:  #pragma: no cover
                     print(tbl.draw_table())
                 with open(fname + '.output', 'r') as outfile:
-                    self.assertEqual(tbl.draw_table(), outfile.read())
+                    self.line_comparison(tbl.draw_table(), outfile.read())
+
+    def line_comparison(self, first, second):
+        alines = first.split('\n')
+        blines = second.split('\n')
+
+        self.assertEqual(len(alines), len(blines))
+
+        for i in range(len(alines)): #pylint: disable=consider-using-enumerate
+            self.assertEqual(alines[i].rstrip(), blines[i].rstrip())
 
 @contextmanager
-def create_table(data, border=True):
+def create_table(data, labels=None, border=True):
     tbl = Table(cell_bordered if border else cell_unborder)
     tbl.data = data
+
+    if labels is not None:
+        tbl.row_labels = labels
 
     yield tbl
 

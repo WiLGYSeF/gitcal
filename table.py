@@ -6,7 +6,7 @@ class Table:
         self.table_name = None
 
         self.label_sep = '  '
-        self.label_lpad = True
+        self.label_lpad = False
         self.left_label = False
 
         self._row_labels = {}
