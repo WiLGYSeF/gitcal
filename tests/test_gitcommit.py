@@ -1,5 +1,4 @@
 import datetime
-import json
 import os
 import unittest
 import unittest.mock as mock
@@ -10,6 +9,8 @@ import gitcommit
 def mkdtime(string):
     return datetime.datetime.strptime(string, '%Y-%m-%d %H:%M:%S')
 
+
+LOG_DIR = os.path.join(os.path.dirname(__file__), 'mocked_data')
 
 DTIME = 'dtime'
 DELTA = 'delta'
@@ -66,13 +67,13 @@ class GitCommitTest(unittest.TestCase):
             ), entry[RESULT])
 
     def test_get_commit_data(self):
-        logfile = os.path.join(os.path.dirname(__file__), 'mocked_data/git-log.txt')
+        logfile = os.path.join(LOG_DIR, 'git-log.txt')
 
         def get_data(args):
             with open(logfile, 'rb') as file:
                 return file.read()
 
-        with open(logfile + '.output', 'r') as file:
+        with open(logfile + '.commits.output', 'r') as file:
             with mock.patch('subprocess.check_output', get_data):
                 commits = gitcommit.get_commit_data()
             self.assertEqual(file.read().rstrip('\n'), str(commits))

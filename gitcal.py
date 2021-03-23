@@ -7,6 +7,51 @@ from table import Table, CellInfo
 from gitcommit import create_table_from_commits, get_commit_data
 
 
+def draw_tables(argspace, table_configs):
+    cell_bordered = CellInfo(
+        width=4,
+        height=3,
+        has_border=True,
+        drawcell=draw_cell_bordered,
+        getval=getval
+    )
+    cell_unborder = CellInfo(
+        width=2,
+        height=1,
+        has_border=False,
+        drawcell=draw_cell_unborder,
+        getval=getval
+    )
+
+    commits = get_commit_data()
+    commits.reverse()
+
+    tablelist = []
+
+    for cfg in table_configs:
+        tbl = create_table_from_commits(
+            cell_bordered if cfg['border'] else cell_unborder,
+            commits,
+            col_count=cfg['col'],
+            make_labels=cfg['label'],
+            labels_inclusive=cfg['label_inclusive'],
+            long_labels=cfg['long_label'],
+            delta=cfg['delta'],
+            start_date=cfg['start'],
+            end_date=cfg['end'],
+            filter_names=cfg['filter_names'],
+        )
+        setattr(tbl, 'config', cfg)
+        tbl.table_name = cfg['tbl_name']
+        tbl.left_label = cfg['left_label']
+        tbl.label_sep = cfg['label_sep']
+        tablelist.append(tbl)
+
+    return Table.draw_tables(
+        tablelist,
+        spacing=argspace.spacing,
+    )
+
 def draw_cell_bordered(val):
     yield '+--+'
     yield '|%s|' % val
@@ -50,53 +95,11 @@ def is_val_touching_adjacent(tbl, val, col, row):
         col < len(tbl.data[row]) - 1 and tbl.data[row][col + 1] > 9
     )
 
-def main(argv):
+def draw_tables_from_args(argv):
     argspace, table_configs = parse_args(argv)
     table_configs.append(table_config_from_namespace(argspace))
 
-    cell_bordered = CellInfo(
-        width=4,
-        height=3,
-        has_border=True,
-        drawcell=draw_cell_bordered,
-        getval=getval
-    )
-    cell_unborder = CellInfo(
-        width=2,
-        height=1,
-        has_border=False,
-        drawcell=draw_cell_unborder,
-        getval=getval
-    )
-
-    commits = get_commit_data()
-    commits.reverse()
-
-    tablelist = []
-
-    for cfg in table_configs:
-        tbl = create_table_from_commits(
-            cell_bordered if cfg['border'] else cell_unborder,
-            commits,
-            col_count=cfg['col'],
-            make_labels=cfg['label'],
-            labels_inclusive=cfg['label_inclusive'],
-            long_labels=cfg['long_label'],
-            delta=cfg['delta'],
-            start_date=cfg['start'],
-            end_date=cfg['end'],
-            filter_names=cfg['filter_names'],
-        )
-        setattr(tbl, 'config', cfg)
-        tbl.table_name = cfg['tbl_name']
-        tbl.left_label = cfg['left_label']
-        tbl.label_sep = cfg['label_sep']
-        tablelist.append(tbl)
-
-    print(Table.draw_tables(
-        tablelist,
-        spacing=argspace.spacing,
-    ))
+    return draw_tables(argspace, table_configs)
 
 if __name__ == '__main__': #pragma: no cover
-    main(sys.argv[1:])
+    print(draw_tables_from_args(sys.argv[1:]))
