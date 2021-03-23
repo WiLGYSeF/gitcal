@@ -38,6 +38,16 @@ class GitcalTest(unittest.TestCase):
     def test_draw_tables_no_border_color(self):
         self.assert_draw_tables('git-log', ['-B', '--no-color'])
 
+    def test_draw_tables_col(self):
+        self.assert_draw_tables('git-log', ['-c', '4'])
+
+    def test_draw_tables_col_guess(self):
+        self.assert_draw_tables('git-log', ['-c', 'guess'])
+
+    def test_draw_tables_col_fail(self):
+        with self.assertRaises(ValueError):
+            self.assert_draw_tables('git-log', ['-c', 'asdf'], print_output=True)
+
     def test_draw_cell_bordered(self):
         for i in range(5):
             val = 'a' * i

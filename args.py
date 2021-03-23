@@ -3,6 +3,23 @@ import datetime
 import re
 
 
+class ColAction(argparse.Action):
+    def __call__(self, parser, namespace, values, option_string=None):
+        val = values
+
+        if val.lower() == 'guess':
+            setattr(namespace, 'col', val)
+            return
+
+        try:
+            col = int(val)
+            setattr(namespace, 'col', val)
+            return
+        except ValueError:
+            pass
+
+        raise ValueError('invalid column value: %s' % val)
+
 class DeltaAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         val = values
@@ -143,7 +160,7 @@ def parse_args(argv):
         help='removes the cell borders from the output'
     )
     group.add_argument('-c', '--col',
-        action='store', metavar='NUM', default=None,
+        action=ColAction, metavar='NUM', default=None,
         help='sets the column count (default is "guess" based on the --delta value)'
     )
     group.add_argument('-d', '--delta',
