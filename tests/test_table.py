@@ -36,7 +36,11 @@ class TableTest(unittest.TestCase):
         self.assert_from_file('6x4a-label-some-label-left-lpad')
 
     def test_2x2a_4x3a_6x4a_tables(self):
-        pass
+        self.assert_from_file([
+            '2x2a',
+            '4x3a',
+            '6x4a',
+        ], print_output=True)
 
     def assert_from_file(self, names, **kwargs):
         if kwargs.get('print_output', False): #pragma: no cover
