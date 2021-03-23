@@ -17,7 +17,7 @@ class DeltaAction(argparse.Action):
             setattr(namespace, 'delta', datetime.timedelta(hours=int(match[1])))
             return
 
-        match = re.fullmatch(r'([0-9]+) *d(?:ays?)?', val)
+        match = re.fullmatch(r'([0-9]+)(?: *d(?:ays?)?)?', val)
         if match is not None:
             setattr(namespace, 'delta', datetime.timedelta(days=int(match[1])))
             return
