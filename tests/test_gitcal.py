@@ -12,6 +12,20 @@ class GitcalTest(unittest.TestCase):
     def test_draw_tables(self):
         self.assert_draw_tables('git-log', [])
 
+    def test_draw_tables_name(self):
+        self.assert_draw_tables('git-log', ['--tbl-name', 'here is a name'])
+
+    def test_draw_tables_name_long(self):
+        self.assert_draw_tables('git-log', [
+            '--tbl-name', 'here is a much longer name that is longer than the table'
+        ])
+
+    def test_draw_tables_name_long_two(self):
+        self.assert_draw_tables('git-log', [
+            '--tbl-name', 'here is a much longer name that is longer than the table',
+            '--table'
+        ])
+
     def test_draw_tables_no_border(self):
         self.assert_draw_tables('git-log', ['-B'])
 
