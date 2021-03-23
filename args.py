@@ -7,12 +7,12 @@ class DeltaAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
         val = values
 
-        match = re.fullmatch(r'([0-9]+) *m(?:inutes?)?', val)
+        match = re.fullmatch(r'([0-9]+) *m(?:in(?:utes?)?)?', val)
         if match is not None:
             setattr(namespace, 'delta', datetime.timedelta(minutes=int(match[1])))
             return
 
-        match = re.fullmatch(r'([0-9]+) *h(?:ours?)?', val)
+        match = re.fullmatch(r'([0-9]+) *h(?:(?:ou)?rs?)?', val)
         if match is not None:
             setattr(namespace, 'delta', datetime.timedelta(hours=int(match[1])))
             return
