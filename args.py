@@ -45,6 +45,7 @@ def table_config_from_namespace(namespace):
 
     return {
         'tbl_name': tbl_name,
+        'color': namespace.color,
         'col_count': col_count,
         'border': namespace.border,
 
@@ -100,6 +101,14 @@ def parse_args(argv):
     parser.add_argument('--tbl-name',
         action='store',
         help='sets the current table name. resets after each --table'
+    )
+    parser.add_argument('--color',
+        action='store_true', default=True,
+        help='display the table in color (default is colored)'
+    )
+    parser.add_argument('--no-color',
+        dest='color', action='store_false',
+        help='do not display the table in color (default is colored)'
     )
     parser.add_argument('--col-count',
         action='store', default=None,

@@ -17,7 +17,12 @@ def draw_cell_unborder(val):
 
 def getval(tbl, val, col=-1, row=-1):
     if val == 0:
-        return '\x1b[100m  \x1b[0m'
+        if tbl.config['color']:
+            return '\x1b[100m  \x1b[0m'
+
+        if not tbl.cell_info.has_border:
+            return '..'
+        return '  '
 
     celldata = '  '
     if tbl.config['print_num']:
@@ -25,8 +30,13 @@ def getval(tbl, val, col=-1, row=-1):
         if len(celldata) > 2:
             celldata = '#^'
 
-        if col >= 0 and (col & 1) == 1:
+        if tbl.config['color'] and col >= 0 and (col & 1) == 1:
             celldata = '\x1b[4m%s\x1b[24m' % celldata
+
+    if not tbl.config['color']:
+        if tbl.config['print_num']:
+            return celldata
+        return '##'
 
     if tbl.config['threshold'] > val:
         return '\x1b[102m%s\x1b[0m' % celldata
