@@ -40,6 +40,8 @@ class Table:
 
     def draw_row_iter(self, row, row_idx=-1):
         gen_list = [ self.draw_cell_iter(row[i], col=i, row=row_idx) for i in range(len(row)) ]
+        if len(gen_list) == 0:
+            return
 
         has_labels = self.has_labels()
         did_label = False
