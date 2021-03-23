@@ -12,6 +12,9 @@ class GitcalTest(unittest.TestCase):
     def test_draw_tables(self):
         self.assert_draw_tables('git-log', [])
 
+    def test_draw_tables_two(self):
+        self.assert_draw_tables('git-log', ['--table'])
+
     def test_draw_tables_name(self):
         self.assert_draw_tables('git-log', ['--tbl-name', 'here is a name'])
 
@@ -34,9 +37,6 @@ class GitcalTest(unittest.TestCase):
 
     def test_draw_tables_no_border_color(self):
         self.assert_draw_tables('git-log', ['-B', '--no-color'])
-
-    def test_draw_tables_two(self):
-        self.assert_draw_tables('git-log', ['--table'])
 
     def test_draw_cell_bordered(self):
         for i in range(5):
@@ -72,7 +72,7 @@ class GitcalTest(unittest.TestCase):
 
             outfname = '%s[%s].output' % (fname, ','.join(args))
 
-            if write_output:
+            if write_output: #pragma: nocover
                 with open(outfname, 'w') as file:
                     file.write(result)
 
