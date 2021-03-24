@@ -13,3 +13,7 @@ Display the number of commits in 2 hour blocks in 12 columns. A block with at le
 An example of two tables, a bordered table with commits in 6 hour blocks, and the table shown above:
 
 ![sample gitcal usage](/docs/images/sample-gitcal-table-mix.png)
+
+Compare commits with other members of a collaborative project:
+
+![sample gitcal usage](/docs/images/sample-gitcal-collab.png)
