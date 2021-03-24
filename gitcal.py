@@ -63,7 +63,7 @@ def draw_cell_unborder(val):
 def getval(tbl, val, col=-1, row=-1):
     if val == 0:
         if tbl.config['color']:
-            return '\x1b[100m  \x1b[0m'
+            return '\x1b[100m  \x1b[49m'
 
         if not tbl.cell_info.has_border:
             return '..'
