@@ -115,6 +115,16 @@ class GitcalTest(unittest.TestCase):
             '-f', 'aaasdf'
         ])
 
+    def test_draw_tables_start(self):
+        self.assert_draw_tables('git-log-multi', ['--start', '2021-03-01'])
+        self.assert_draw_tables('git-log-multi', ['--start', '2021-03-18'])
+        self.assert_draw_tables('git-log-multi', ['--start', '2021-03-20'])
+        self.assert_draw_tables('git-log-multi', ['--start', '2021-04-01'])
+
+    def test_draw_tables_start_fail(self):
+        with self.assertRaises(ValueError):
+            self.assert_draw_tables('git-log-multi', ['--start', 'aaaaaa'])
+
     def test_draw_cell_bordered(self):
         for i in range(5):
             val = 'a' * i

@@ -31,6 +31,8 @@ def create_table_from_commits(cell_info, commits, **kwargs):
     if start_date is not None:
         while start_idx < len(commits) and commits[start_idx]['datetime'] < start_date:
             start_idx += 1
+        if start_idx == len(commits):
+            return tbl
 
     first_date = commits[start_idx]['datetime']
     curdate = datetime.datetime(first_date.year, first_date.month, first_date.day)
@@ -46,7 +48,6 @@ def create_table_from_commits(cell_info, commits, **kwargs):
         nonlocal curdate, row
 
         row.append(val)
-
         if len(row) == col_count:
             data.append(row)
             row = []
