@@ -245,7 +245,7 @@ def create_table(data, **kwargs):
     tbl = Table(cell_bordered if border else cell_unborder)
     tbl.table_name = kwargs.get('name')
     tbl.data = data
-    tbl.left_label = kwargs.get('label_left', False)
+    tbl.label_left = kwargs.get('label_left', False)
     tbl.label_lpad = kwargs.get('label_lpad', False)
 
     if labels is not None:

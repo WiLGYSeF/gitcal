@@ -7,7 +7,7 @@ class Table:
 
         self.label_sep = '  '
         self.label_lpad = False
-        self.left_label = False
+        self.label_left = False
 
         self._row_labels = {}
         self._longest_label_length = 0
@@ -72,7 +72,7 @@ class Table:
                 if label is None:
                     label = ''
 
-                if self.left_label:
+                if self.label_left:
                     padding = ' '  * (self.longest_label_length - len(label))
                     padding_after = ' '  * (self.max_length() - self.longest_label_length - len(self.label_sep) - self.row_cell_length())
 
@@ -121,7 +121,7 @@ class Table:
             length = len(self.table_name)
 
         if include_label and self.has_labels():
-            if self.left_label:
+            if self.label_left:
                 length += len(self.label_sep) + self.longest_label_length
             else:
                 if name_longer:
@@ -188,7 +188,7 @@ class Table:
                     continue
 
                 name = ''
-                if tbl.has_labels() and tbl.left_label:
+                if tbl.has_labels() and tbl.label_left:
                     name += ' ' * (tbl.longest_label_length + len(tbl.label_sep))
                 name += tbl.table_name
                 name += ' ' * (tbl.max_length() - len(name))

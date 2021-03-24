@@ -43,7 +43,7 @@ def draw_tables(argspace, table_configs):
         )
         setattr(tbl, 'config', cfg)
         tbl.table_name = cfg['tbl_name']
-        tbl.left_label = cfg['left_label']
+        tbl.label_left = cfg['label_left']
         tbl.label_sep = cfg['label_sep']
         tablelist.append(tbl)
 

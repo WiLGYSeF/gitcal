@@ -83,7 +83,7 @@ def table_config_from_namespace(namespace):
         'start': start,
         'end': end,
 
-        'left_label': namespace.left_label,
+        'label_left': namespace.label_left,
         'label_sep': namespace.label_sep,
         'label': namespace.label,
         'label_inclusive': namespace.label_inclusive,
@@ -189,12 +189,12 @@ def parse_args(argv):
     )
 
     group = parser.add_argument_group('label options')
-    group.add_argument('--left-label',
+    group.add_argument('--label-left',
         action='store_true', default=True,
         help='display labels on the left-hand side (default)'
     )
-    group.add_argument('--right-label',
-        dest='left_label', action='store_true', default=False,
+    group.add_argument('--label-right',
+        dest='label_left', action='store_true', default=False,
         help='display labels on the right-hand side'
     )
     group.add_argument('--label-sep',
