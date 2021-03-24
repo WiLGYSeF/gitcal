@@ -144,6 +144,9 @@ class GitcalTest(unittest.TestCase):
         self.assert_draw_tables('git-log', ['-B', '--num'])
         self.assert_draw_tables('git-log', ['-B', '--no-color', '--num'])
 
+    def test_draw_tables_threshold(self):
+        self.assert_draw_tables('git-log', ['-t', '4'])
+
     def test_draw_cell_bordered(self):
         for i in range(5):
             val = 'a' * i
