@@ -139,6 +139,7 @@ class GitcalTest(unittest.TestCase):
 
     def test_draw_tables_num_no_border(self):
         self.assert_draw_tables('git-log', ['-B', '--num'])
+        self.assert_draw_tables('git-log', ['-B', '--no-color', '--num'])
 
     def test_draw_cell_bordered(self):
         for i in range(5):
