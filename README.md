@@ -6,4 +6,10 @@ A python script to visualize when git commits were made in a repository in a cal
 
 # Examples
 
-![sample Gitcal usage](/docs/images/sample-gitcal.png)
+Display the number of commits in 2 hour blocks in 12 columns. A block with at least 4 commits is colored in green:
+
+![sample gitcal usage](/docs/images/sample-gitcal.png)
+
+An example of two tables, a bordered table with commits in 6 hour blocks, and the table shown above:
+
+![sample gitcal usage](/docs/images/sample-gitcal-table-mix.png)
