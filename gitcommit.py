@@ -68,8 +68,6 @@ def create_table_from_commits(cell_info, commits, **kwargs):
 
     for idx in range(start_idx, len(commits)):
         commit = commits[idx]
-        if start_date is not None and commit['datetime'] < start_date:
-            continue
         if end_date is not None and commit['datetime'] > end_date:
             break
         if len(filter_names) != 0 and commit['name'] not in filter_names:
