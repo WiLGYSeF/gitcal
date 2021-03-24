@@ -116,19 +116,29 @@ class GitcalTest(unittest.TestCase):
         ])
 
     def test_draw_tables_start(self):
-        self.assert_draw_tables('git-log-multi', ['--start', '2021-03-01 01:23:45'])
+        self.assert_draw_tables('git-log-multi', ['--start', '2021-03-01 01:23:45'], )
         self.assert_draw_tables('git-log-multi', ['--start', '2021-03-18'])
         self.assert_draw_tables('git-log-multi', ['--start', '2021-03-20'])
         self.assert_draw_tables('git-log-multi', ['--start', '2021-04-01'])
+
+    def test_draw_tables_start_fail(self):
+        with self.assertRaises(ValueError):
+            self.assert_draw_tables('git-log-multi', ['--start', 'aaaaaa'])
 
     def test_draw_tables_end(self):
         self.assert_draw_tables('git-log-multi', ['--end', '2021-03-01 01:23:45'])
         self.assert_draw_tables('git-log-multi', ['--end', '2021-03-20'])
         self.assert_draw_tables('git-log-multi', ['--end', '2021-04-01'])
 
-    def test_draw_tables_start_fail(self):
+    def test_draw_tables_end_fail(self):
         with self.assertRaises(ValueError):
-            self.assert_draw_tables('git-log-multi', ['--start', 'aaaaaa'])
+            self.assert_draw_tables('git-log-multi', ['--end', 'aaaaaa'])
+
+    def test_draw_tables_num(self):
+        self.assert_draw_tables('git-log', ['--num'])
+
+    def test_draw_tables_num_no_border(self):
+        self.assert_draw_tables('git-log', ['-B', '--num'])
 
     def test_draw_cell_bordered(self):
         for i in range(5):

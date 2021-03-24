@@ -75,7 +75,11 @@ def getval(tbl, val, col=-1, row=-1):
         if len(celldata) > 2:
             celldata = '#^'
 
-        if tbl.config['color'] and col != -1 and row != -1 and (col & 1) == 1:
+        if (
+            not tbl.cell_info.has_border \
+            and tbl.config['color']
+            and col != -1 and row != -1 and (col & 1) == 1
+        ):
             if is_val_touching_adjacent(tbl, val, col, row):
                 celldata = '\x1b[4m%s\x1b[24m' % celldata
 
