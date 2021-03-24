@@ -139,7 +139,7 @@ def parse_args(argv):
     )
 
     group = parser.add_argument_group('table options')
-    group.add_argument('--tbl-name',
+    group.add_argument('-n', '--tbl-name',
         action='store', metavar='NAME',
         help='sets the current table name, resets after each --table'
     )
