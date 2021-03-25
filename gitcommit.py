@@ -28,13 +28,18 @@ def create_table_from_commits(cell_info, commits, **kwargs):
     start_idx = 0
     counter = 0
 
-    if start_date is not None:
-        while start_idx < len(commits) and commits[start_idx]['datetime'] < start_date:
-            start_idx += 1
-        if start_idx == len(commits):
-            return tbl
+    first_date = commits[0]['datetime']
 
-    first_date = commits[start_idx]['datetime']
+    if start_date is not None:
+        if start_date > first_date:
+            while start_idx < len(commits) and commits[start_idx]['datetime'] < start_date:
+                start_idx += 1
+            if start_idx == len(commits):
+                return tbl
+            first_date = commits[start_idx]['datetime']
+        else:
+            first_date = start_date
+
     curdate = datetime.datetime(first_date.year, first_date.month, first_date.day)
     if make_labels:
         labels.append(shortdate(
@@ -66,6 +71,10 @@ def create_table_from_commits(cell_info, commits, **kwargs):
 
         curdate += delta
 
+    if start_date is not None:
+        while curdate < commits[0]['datetime']:
+            append(0)
+
     for idx in range(start_idx, len(commits)):
         commit = commits[idx]
         if end_date is not None and commit['datetime'] > end_date:
@@ -84,6 +93,10 @@ def create_table_from_commits(cell_info, commits, **kwargs):
 
     if counter != 0:
         append(counter)
+
+    if end_date is not None:
+        while curdate < end_date:
+            append(0)
 
     if len(row) != 0:
         data.append(row)
