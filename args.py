@@ -139,7 +139,7 @@ def parse_args(argv):
     class AllUsersAction(argparse.Action):
         def __call__(self, parser, namespace, values, option_string=None):
             users = gitcommit.get_users_from_commits()
-            for user in users:
+            for user in sorted(users):
                 namespace.tbl_name = user
                 namespace.filter = [ user ]
                 table_configs.append(
