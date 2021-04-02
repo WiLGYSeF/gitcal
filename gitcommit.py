@@ -148,3 +148,13 @@ def get_commit_data():
             'name': name
         })
     return commits
+
+def get_users_from_commits(commits=None):
+    if commits is None:
+        commits = get_commit_data()
+
+    users = set()
+    for commit in commits:
+        users.add(commit['name'])
+
+    return users
