@@ -77,3 +77,14 @@ class GitCommitTest(unittest.TestCase):
             with mock.patch('subprocess.check_output', get_data):
                 commits = gitcommit.get_commit_data()
             self.assertEqual(file.read().rstrip('\n'), str(commits))
+
+    def test_get_users_from_commits(self):
+        logfile = os.path.join(LOG_DIR, 'git-log-multi.txt')
+
+        def get_data(args):
+            with open(logfile, 'rb') as file:
+                return file.read()
+
+        with mock.patch('subprocess.check_output', get_data):
+            users = gitcommit.get_users_from_commits()
+        self.assertEqual(users, set(['WiLGYSeF', 'aaasdf']))

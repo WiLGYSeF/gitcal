@@ -2,6 +2,8 @@ import argparse
 import datetime
 import re
 
+import gitcommit
+
 
 class ColAction(argparse.Action):
     def __call__(self, parser, namespace, values, option_string=None):
@@ -134,6 +136,16 @@ def parse_args(argv):
         def __call__(self, parser, namespace, values, option_string=None):
             table_configs.append(table_config_from_namespace(namespace))
 
+    class AllUsersAction(argparse.Action):
+        def __call__(self, parser, namespace, values, option_string=None):
+            users = gitcommit.get_users_from_commits()
+            for user in sorted(users):
+                namespace.tbl_name = user
+                namespace.filter = [ user ]
+                table_configs.append(
+                    table_config_from_namespace(namespace)
+                )
+
     parser = argparse.ArgumentParser(
         description='Show git commits in a visual calendar-like format'
     )
@@ -186,6 +198,10 @@ def parse_args(argv):
     group.add_argument('--spacing',
         action='store', type=int, metavar='NUM', default=2,
         help='change the spacing between tables (default 2)'
+    )
+    group.add_argument('--all-users',
+        action=AllUsersAction, nargs=0,
+        help='create labelled tables for all usernames'
     )
 
     group = parser.add_argument_group('label options')
@@ -242,3 +258,6 @@ def parse_args(argv):
 
     argspace = parser.parse_args(argv)
     return argspace, table_configs
+
+def has_all_users(argv):
+    return '--all-users' in argv
