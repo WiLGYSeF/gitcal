@@ -73,8 +73,8 @@ class Table:
                     label = ''
 
                 if self.label_left:
-                    padding = ' '  * (self.longest_label_length - len(label))
-                    padding_after = ' '  * (self.max_length() - self.longest_label_length - len(self.label_sep) - self.row_cell_length())
+                    padding = ' ' * (self.longest_label_length - len(label))
+                    padding_after = ' ' * (self.max_length() - self.longest_label_length - len(self.label_sep) - self.row_cell_length())
 
                     if self.label_lpad:
                         label = padding + label
@@ -83,13 +83,16 @@ class Table:
 
                     chars = '%s%s%s%s' % (label, self.label_sep, chars, padding_after)
                 else:
-                    padding = ' '  * (self.max_length() - self.row_cell_length() - len(self.label_sep) - len(label))
+                    padding = ' ' * (self.max_length() - self.row_cell_length() - len(self.label_sep) - len(label))
+
                     if self.label_lpad:
                         label = padding + label
                     else:
                         label += padding
 
                     chars += self.label_sep + label
+            else:
+                chars += ' ' * (self.max_length() - self.row_cell_length())
 
             yield chars
             first_line = False
