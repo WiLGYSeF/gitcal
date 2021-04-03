@@ -258,3 +258,6 @@ def parse_args(argv):
 
     argspace = parser.parse_args(argv)
     return argspace, table_configs
+
+def has_all_users(argv):
+    return '--all-users' in argv
