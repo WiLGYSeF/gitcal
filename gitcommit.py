@@ -30,6 +30,11 @@ def create_table_from_commits(cell_info, commits, **kwargs):
 
     first_date = commits[0]['datetime']
 
+    if start_date is None:
+        ideal_date = get_ideal_startdate(first_date, delta)
+        if end_date is None or ideal_date < end_date:
+            start_date = ideal_date
+
     if start_date is not None:
         if start_date > first_date:
             while start_idx < len(commits) and commits[start_idx]['datetime'] < start_date:
@@ -112,6 +117,16 @@ def create_table_from_commits(cell_info, commits, **kwargs):
         tbl.row_labels = labels
 
     return tbl
+
+def get_ideal_startdate(start_date, delta):
+    if delta == datetime.timedelta(days=1):
+        dtime = datetime.datetime(start_date.year, start_date.month, start_date.day)
+        while dtime.weekday() != 6:
+            dtime -= delta
+        return dtime
+    if delta == datetime.timedelta(hours=1):
+        return datetime.datetime(start_date.year, start_date.month, start_date.day)
+    return None
 
 def shortdate(dtime, delta, include_year=True):
     if delta.seconds % 86400 == 0:
