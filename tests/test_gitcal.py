@@ -150,6 +150,25 @@ class GitcalTest(unittest.TestCase):
     def test_draw_tables_all_users(self):
         self.assert_draw_tables('git-log-multi-t', ['-B', '--no-label', '--all-users'])
 
+    def test_draw_tables_all_users_merge(self):
+        self.assert_draw_tables('git-log-multi-t', [
+            '-B',
+            '--no-label',
+            '--all-users',
+            '-m', 'Jonathan', 'John Smith', 'jsmith',
+            '-m', 'mads3326', 'Yombo'
+        ])
+
+    def test_draw_tables_all_users_merge_fail(self):
+        with self.assertRaises(ValueError):
+            self.assert_draw_tables('git-log-multi-t', ['-m', 'Jonathan', '--all-users'])
+
+        with self.assertRaises(ValueError):
+            self.assert_draw_tables('git-log-multi-t', [
+                '-m', 'jsmith', 'does not exist',
+                '--all-users'
+            ])
+
     def test_draw_cell_bordered(self):
         for i in range(5):
             val = 'a' * i

@@ -156,6 +156,9 @@ def append_all_users_table(namespace, table_configs):
         else:
             names = merge[1:]
 
+        if len(names) < 2:
+            raise ValueError('must merge with at least two users')
+
         users_merged.update(names)
         merge_dict[alias] = {
             'filter': names
@@ -163,7 +166,7 @@ def append_all_users_table(namespace, table_configs):
 
     for user in users_merged:
         if user not in user_dict:
-            raise Exception('cannot merge with nonexisting user: %s' % user)
+            raise ValueError('cannot merge with nonexisting user: %s' % user)
         del user_dict[user]
     user_dict.update(merge_dict)
 
@@ -305,6 +308,3 @@ def parse_args(argv):
 
     argspace = parser.parse_args(argv)
     return argspace, table_configs
-
-def has_all_users(argv):
-    return '--all-users' in argv
