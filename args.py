@@ -141,9 +141,37 @@ def parse_args(argv):
             users = gitcommit.get_users_from_commits()
             do_label = namespace.label
 
-            for user in sorted(users):
-                namespace.tbl_name = user
-                namespace.filter = [ user ]
+            user_dict = {}
+            for user in users:
+                user_dict[user] = {
+                    'filter': [ user ]
+                }
+
+            merge_dict = {}
+            users_merged = set()
+
+            for merge in namespace.merge:
+                alias = merge[0]
+                if alias in user_dict:
+                    names = merge
+                else:
+                    names = merge[1:]
+
+                users_merged.update(names)
+                merge_dict[alias] = {
+                    'filter': names
+                }
+
+            for user in users_merged:
+                if user not in user_dict:
+                    raise Exception('cannot merge with nonexisting user: %s' % user)
+                del user_dict[user]
+            user_dict.update(merge_dict)
+
+            for name in sorted(user_dict):
+                user = user_dict[name]
+                namespace.tbl_name = name
+                namespace.filter = user['filter']
 
                 namespace.label = do_label
                 namespace.label_left = True
@@ -152,6 +180,8 @@ def parse_args(argv):
                 table_configs.append(
                     table_config_from_namespace(namespace)
                 )
+
+            namespace.merge = []
 
     parser = argparse.ArgumentParser(
         description='Show git commits in a visual calendar-like format'
@@ -189,6 +219,10 @@ def parse_args(argv):
     group.add_argument('-f', '--filter',
         action='append',
         help='adds a git username to filter for in the table entries, resets after each --table'
+    )
+    group.add_argument('-m', '--merge',
+        action='append', metavar=('ALIAS', 'NAME'), nargs='+', default=[],
+        help='merge user tables to one table under ALIAS when using --all-users'
     )
     group.add_argument('--start',
         action='store', metavar='DATE',
