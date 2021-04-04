@@ -129,59 +129,65 @@ def guess_col_count(delta, min_col=4, max_col=12):
         checked.add(idx)
     return count
 
+def append_table_config(namespace, table_configs):
+    if namespace.all_users:
+        append_all_users_table(namespace, table_configs)
+        namespace.all_users = False
+    else:
+        table_configs.append(table_config_from_namespace(namespace))
+
+def append_all_users_table(namespace, table_configs):
+    users = gitcommit.get_users_from_commits()
+    do_label = namespace.label
+
+    user_dict = {}
+    for user in users:
+        user_dict[user] = {
+            'filter': [ user ]
+        }
+
+    merge_dict = {}
+    users_merged = set()
+
+    for merge in namespace.merge:
+        alias = merge[0]
+        if alias in user_dict:
+            names = merge
+        else:
+            names = merge[1:]
+
+        users_merged.update(names)
+        merge_dict[alias] = {
+            'filter': names
+        }
+
+    for user in users_merged:
+        if user not in user_dict:
+            raise Exception('cannot merge with nonexisting user: %s' % user)
+        del user_dict[user]
+    user_dict.update(merge_dict)
+
+    for name in sorted(user_dict):
+        user = user_dict[name]
+        namespace.tbl_name = name
+        namespace.filter = user['filter']
+
+        namespace.label = do_label
+        namespace.label_left = True
+        do_label = False
+
+        table_configs.append(
+            table_config_from_namespace(namespace)
+        )
+
+    namespace.merge = []
+
 def parse_args(argv):
     table_configs = []
 
     class TableAction(argparse.Action):
         def __call__(self, parser, namespace, values, option_string=None):
-            table_configs.append(table_config_from_namespace(namespace))
-
-    class AllUsersAction(argparse.Action):
-        def __call__(self, parser, namespace, values, option_string=None):
-            users = gitcommit.get_users_from_commits()
-            do_label = namespace.label
-
-            user_dict = {}
-            for user in users:
-                user_dict[user] = {
-                    'filter': [ user ]
-                }
-
-            merge_dict = {}
-            users_merged = set()
-
-            for merge in namespace.merge:
-                alias = merge[0]
-                if alias in user_dict:
-                    names = merge
-                else:
-                    names = merge[1:]
-
-                users_merged.update(names)
-                merge_dict[alias] = {
-                    'filter': names
-                }
-
-            for user in users_merged:
-                if user not in user_dict:
-                    raise Exception('cannot merge with nonexisting user: %s' % user)
-                del user_dict[user]
-            user_dict.update(merge_dict)
-
-            for name in sorted(user_dict):
-                user = user_dict[name]
-                namespace.tbl_name = name
-                namespace.filter = user['filter']
-
-                namespace.label = do_label
-                namespace.label_left = True
-                do_label = False
-
-                table_configs.append(
-                    table_config_from_namespace(namespace)
-                )
-
-            namespace.merge = []
+            append_table_config(namespace, table_configs)
 
     parser = argparse.ArgumentParser(
         description='Show git commits in a visual calendar-like format'
@@ -241,7 +247,7 @@ def parse_args(argv):
         help='change the spacing between tables (default 2)'
     )
     group.add_argument('--all-users',
-        action=AllUsersAction, nargs=0,
+        action='store_true', default=False,
         help='create labelled tables for all usernames'
     )
 

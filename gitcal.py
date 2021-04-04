@@ -3,7 +3,6 @@
 import sys
 
 import args
-from args import parse_args, table_config_from_namespace
 from table import Table, CellInfo
 from gitcommit import create_table_from_commits, get_commit_data
 
@@ -101,9 +100,8 @@ def is_val_touching_adjacent(tbl, val, col, row):
     )
 
 def draw_tables_from_args(argv):
-    argspace, table_configs = parse_args(argv)
-    if not args.has_all_users(argv):
-        table_configs.append(table_config_from_namespace(argspace))
+    argspace, table_configs = args.parse_args(argv)
+    args.append_table_config(argspace, table_configs)
 
     return draw_tables(argspace, table_configs)
 
