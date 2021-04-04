@@ -137,8 +137,13 @@ def append_table_config(namespace, table_configs):
         table_configs.append(table_config_from_namespace(namespace))
 
 def append_all_users_table(namespace, table_configs):
-    users = gitcommit.get_users_from_commits()
+    commits = gitcommit.get_commit_data()
+    users = gitcommit.get_users_from_commits(commits)
     do_label = namespace.label
+
+    last_date = namespace.end
+    if last_date is None:
+        last_date = commits[0]['datetime'].strftime('%Y-%m-%d %H:%M:%S')
 
     user_dict = {}
     for user in users:
@@ -174,6 +179,7 @@ def append_all_users_table(namespace, table_configs):
         user = user_dict[name]
         namespace.tbl_name = name
         namespace.filter = user['filter']
+        namespace.end = last_date
 
         namespace.label = do_label
         namespace.label_left = True
