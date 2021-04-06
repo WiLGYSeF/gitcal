@@ -241,11 +241,11 @@ def parse_args(argv):
     )
     group.add_argument('--start',
         action='store', metavar='DATE',
-        help='starts the table after date (%Y-%m-%d %H:%M:%S format)'
+        help='starts the table after date (%%Y-%%m-%%d %%H:%%M:%%S format)'
     )
     group.add_argument('--end',
         action='store', metavar='DATE',
-        help='ends the table after date (%Y-%m-%d %H:%M:%S format)'
+        help='ends the table after date (%%Y-%%m-%%d %%H:%%M:%%S format)'
     )
     group.add_argument('-T', '--table',
         action=TableAction, nargs=0,
