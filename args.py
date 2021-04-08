@@ -1,6 +1,7 @@
 import argparse
 import datetime
 import re
+import sys
 
 import gitcommit
 
@@ -141,6 +142,12 @@ def append_all_users_table(namespace, table_configs):
     users = gitcommit.get_users_from_commits(commits)
     do_label = namespace.label
 
+    for user in namespace.exclude:
+        if user in users:
+            users.remove(user)
+        else:
+            print('WARN: user "%s" not in user list' % user, file=sys.stderr)
+
     last_date = namespace.end
     if last_date is None:
         last_date = commits[0]['datetime'].strftime('%Y-%m-%d %H:%M:%S')
@@ -229,7 +236,8 @@ def parse_args(argv):
     )
     group.add_argument('-d', '--delta',
         action=DeltaAction, metavar='TIME',
-        help='sets the delta value of each cell (default 1 day), time can be given in #d, #h, or #m (e.g. 4h)'
+        help='sets the delta value of each cell (default 1 day)'
+        + ' time can be given in #d, #h, or #m (e.g. 4h)'
     )
     group.add_argument('-f', '--filter',
         action='append',
@@ -238,6 +246,10 @@ def parse_args(argv):
     group.add_argument('-m', '--merge',
         action='append', metavar=('ALIAS', 'NAME'), nargs='+', default=[],
         help='merge user tables to one table under ALIAS when using --all-users'
+    )
+    group.add_argument('--exclude',
+        action='append', metavar='NAME', default=[],
+        help='users to exclude when using --all-users'
     )
     group.add_argument('--start',
         action='store', metavar='DATE',
@@ -249,7 +261,8 @@ def parse_args(argv):
     )
     group.add_argument('-T', '--table',
         action=TableAction, nargs=0,
-        help='creates a new table to display alongside the others, all table options are applied to the previous table'
+        help='creates a new table to display alongside the others'
+        + ', all table options are applied to the previous table'
     )
     group.add_argument('--spacing',
         action='store', type=int, metavar='NUM', default=2,
@@ -301,7 +314,8 @@ def parse_args(argv):
     group = parser.add_argument_group('cell options')
     group.add_argument('-t', '--threshold',
         action='store', type=int, metavar='NUM', default=0,
-        help='set the threshold value where the cell value is no longer considered small (default 0)'
+        help='set the threshold value where the cell value is no longer considered small'
+        + ' (default 0)'
     )
     group.add_argument('--num',
         action='store_true', default=False,

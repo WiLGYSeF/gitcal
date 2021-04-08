@@ -169,6 +169,14 @@ class GitcalTest(unittest.TestCase):
                 '--all-users'
             ])
 
+    def test_draw_tables_all_users_exclude(self):
+        self.assert_draw_tables('git-log-multi-t', [
+            '-B',
+            '--no-label',
+            '--all-users',
+            '--exclude', 'long default user'
+        ])
+
     def test_draw_cell_bordered(self):
         for i in range(5):
             val = 'a' * i
