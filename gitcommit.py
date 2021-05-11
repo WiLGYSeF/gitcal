@@ -32,7 +32,7 @@ def create_table_from_commits(cell_info, commits, **kwargs):
 
     if start_date is None:
         ideal_date = get_ideal_startdate(first_date, delta)
-        if end_date is None or ideal_date < end_date:
+        if ideal_date is not None and (end_date is None or ideal_date < end_date):
             start_date = ideal_date
 
     if start_date is not None:
