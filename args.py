@@ -254,14 +254,6 @@ def parse_args(argv):
         action='append',
         help='adds a git username to filter for in the table entries, resets after each --table'
     )
-    group.add_argument('-m', '--merge',
-        action='append', metavar=('ALIAS', 'NAME'), nargs='+', default=[],
-        help='merge user tables to one table under ALIAS when using --all-users'
-    )
-    group.add_argument('--exclude',
-        action='append', metavar='NAME', default=[],
-        help='users to exclude when using --all-users'
-    )
     group.add_argument('--start',
         action='store', metavar='DATE',
         help='starts the table after date (%%Y-%%m-%%d or %%Y-%%m-%%d %%H:%%M:%%S format)'
@@ -279,10 +271,22 @@ def parse_args(argv):
         action='store', type=int, metavar='NUM', default=2,
         help='change the spacing between tables (default 2)'
     )
+
+    group = parser.add_argument_group('all users options')
     group.add_argument('--all-users',
         action='store_true', default=False,
         help='create labelled tables for all usernames'
     )
+    group.add_argument('-m', '--merge',
+        action='append', metavar=('ALIAS', 'NAME'), nargs='+', default=[],
+        help='merge user tables to one table under ALIAS when using --all-users'
+    )
+    group.add_argument('--exclude',
+        action='append', metavar='NAME', default=[],
+        help='users to exclude when using --all-users'
+    )
+
+    group = parser.add_argument_group('collapse options')
     group.add_argument('--collapse',
         action='store', type=int, metavar='NUM', default=-1,
         help='collapse consecutive empty rows together if they exceed this count, use -1 to '
