@@ -10,10 +10,54 @@ Display the number of commits in 2 hour blocks in 12 columns. A block with at le
 
 ![sample gitcal usage](/docs/images/sample-gitcal.png)
 
-An example of two tables, a bordered table with commits in 6 hour blocks, and the table shown above:
+---
+
+An example of displaying two tables side-by-side, one with a border and different date range:
 
 ![sample gitcal usage](/docs/images/sample-gitcal-table-mix.png)
 
+---
+
 Compare commits with other members of a collaborative project:
 
-![sample gitcal usage](/docs/images/sample-gitcal-collab.png)
+![sample gitcal usage](/docs/images/sample-gitcal-all-users.png)
+
+# Installation
+
+1. Clone this repository and place somewhere like `~/.local/bin/gitcal-py`
+2. Create a symlink from `~/.local/bin/gitcal-py/gitcal.py` to `~/.local/bin/gitcal`
+
+# Displaying Multiple tables
+
+gitcal uses the `-T/--table` argument to display multiple tables.
+A table is created based on the arguments on each side of `-T`, where the command below is used to create multiple tables:
+
+```bash
+gitcal -T -n "My Commits" --num --no-label -f "<my username>" -t 4 -T -n "Partner 1" -f "<partner 1>" -f "<also partner 1>"
+#     ^   ^_______________________table 2________________________^    ^______________________table 3______________________^
+#     |
+# table 1
+```
+
+A sample result of the above command (below describes each table):
+
+![sample gitcal usage](/docs/images/sample-gitcal-multiple-tables.png)
+
+### Table 1
+
+Since there are no arguments to the left of the first `-T`, the default table with all the daily commits is displayed per week.
+
+### Table 2
+
+To the right side of the first `-T`, we:
+- set the table name with `-n`
+- turn on commit counts with `--num` (underlines are used to distinguish number entries since there is no spacing on borderless tables)
+- turn off labels with `--no-label` since the labels from the first table can be used instead
+- filter for one user with `-f`
+- set the color threshold `-t` to 4 commits
+
+### Table 3
+
+The second `-T` separates the second and third table options.
+Note how table 3 only explicitly sets the table name and user filter, but the settings from the second table are carried over to the third table as well.
+Most, but not all, settings are carried over between tables so they do not have to be repeated.
