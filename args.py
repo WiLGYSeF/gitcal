@@ -192,9 +192,9 @@ def append_all_users_table(namespace, table_configs):
         namespace.label_left = True
         do_label = False
 
-        table_configs.append(
-            table_config_from_namespace(namespace)
-        )
+        cfg = table_config_from_namespace(namespace)
+        cfg['all_users'] = True
+        table_configs.append(cfg)
 
     namespace.merge = []
 

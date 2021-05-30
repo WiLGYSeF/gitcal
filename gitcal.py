@@ -41,25 +41,38 @@ def draw_tables(argspace, table_configs):
             end_date=cfg['end'],
             filter_names=cfg['filter_names'],
         )
-
-        if cfg['collapse'] > 0:
-            collapse_table(tbl, cfg['collapse'])
-
         setattr(tbl, 'config', cfg)
         tbl.table_name = cfg['tbl_name']
         tbl.label_left = cfg['label_left']
         tbl.label_sep = cfg['label_sep']
         tablelist.append(tbl)
 
+    do_collapses(tablelist)
+
     return Table.draw_tables(
         tablelist,
         spacing=argspace.spacing,
     )
 
-def collapse_table(tbl, consecutive):
-    if consecutive < 1:
-        raise ValueError('collapse value must be at least 1')
+def do_collapses(tablelist):
+    idx = 0
+    while idx < len(tablelist):
+        tbl = tablelist[idx]
+        if tbl.config['collapse'] > 0:
+            if tbl.config.get('all_users', False):
+                nxidx = idx + 1
+                while nxidx < len(tablelist):
+                    next_tbl = tablelist[nxidx]
+                    if not next_tbl.config.get('all_users', False):
+                        break
+                    nxidx += 1
+                collapse_tables(tablelist[idx:nxidx], tbl.config['collapse'])
+                idx = nxidx - 1
+            else:
+                collapse_tables([tbl], tbl.config['collapse'])
+        idx += 1
 
+def collapse_tables(tablelist, consecutive):
     def empty(row):
         for val in row:
             if val != 0:
@@ -69,34 +82,41 @@ def collapse_table(tbl, consecutive):
     last_empty = None
     idx = 0
 
-    while idx < len(tbl.data):
-        row = tbl.data[idx]
-        if empty(row):
+    row_count = min(map(lambda x: len(x.data), tablelist))
+
+    while idx < row_count:
+        all_empty = True
+        for tbl in tablelist:
+            if not empty(tbl.data[idx]):
+                all_empty = False
+                break
+        if all_empty:
             if last_empty is None:
                 last_empty = idx
             idx += 1
-            continue
+            if idx != row_count:
+                continue
 
         if last_empty is None:
             idx += 1
             continue
 
         if idx - last_empty >= consecutive:
-            tbl.data = tbl.data[:last_empty] + [[-1] * len(tbl.data[0])] + tbl.data[idx:]
-            if tbl.has_labels():
-                labels = tbl.row_labels
-                length = tbl.longest_label_length
-                if isinstance(labels, dict):
-                    for i in range(last_empty, idx):
-                        if i in labels:
-                            del labels[i]
-                    tbl.row_labels = labels
-                else:
-                    tbl.row_labels = labels[:last_empty] + [''] + labels[idx:]
+            for tbl in tablelist:
+                tbl.data = tbl.data[:last_empty] + [[-1] * len(tbl.data[0])] + tbl.data[idx:]
+                if tbl.has_labels():
+                    labels = tbl.row_labels
+                    if isinstance(labels, dict):
+                        for i in range(last_empty, idx):
+                            if i in labels:
+                                del labels[i]
+                        tbl.row_labels = labels
+                    else:
+                        tbl.row_labels = labels[:last_empty] + [''] + labels[idx:]
+            row_count = min(map(lambda x: len(x.data), tablelist))
             idx -= idx - last_empty - 1
         last_empty = None
         idx += 1
-
 
 def draw_cell_bordered(val):
     yield '+--+'
