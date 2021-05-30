@@ -47,10 +47,86 @@ def draw_tables(argspace, table_configs):
         tbl.label_sep = cfg['label_sep']
         tablelist.append(tbl)
 
+    do_collapses(tablelist)
+
     return Table.draw_tables(
         tablelist,
         spacing=argspace.spacing,
     )
+
+def do_collapses(tablelist):
+    idx = 0
+    while idx < len(tablelist):
+        tbl = tablelist[idx]
+        if tbl.config['collapse_flag'] == 1 or tbl.config['collapse'] > 0:
+            if tbl.config['collapse_flag'] == 1:
+                collapse = None
+                nxidx = idx + 1
+                while nxidx < len(tablelist):
+                    next_tbl = tablelist[nxidx]
+                    nxidx += 1
+                    if collapse is None and next_tbl.config['collapse'] > 0:
+                        collapse = next_tbl.config['collapse']
+                    if next_tbl.config['collapse_flag'] == -1:
+                        break
+                if collapse is not None and collapse > 0:
+                    collapse_tables(tablelist[idx:nxidx], collapse)
+                idx = nxidx - 1
+            else:
+                collapse_tables([tbl], tbl.config['collapse'])
+        idx += 1
+
+def collapse_tables(tablelist, consecutive):
+    def empty(row):
+        for val in row:
+            if val != 0:
+                return False
+        return True
+
+    last_empty = None
+    idx = 0
+
+    row_count = max(map(lambda x: len(x.data), tablelist))
+
+    while idx < row_count:
+        new_tbls = []
+        for tbl in tablelist:
+            if idx < len(tbl.data):
+                new_tbls.append(tbl)
+        tablelist = new_tbls
+
+        all_empty = True
+        for tbl in tablelist:
+            if not empty(tbl.data[idx]):
+                all_empty = False
+                break
+        if all_empty:
+            if last_empty is None:
+                last_empty = idx
+            idx += 1
+            if idx != row_count:
+                continue
+
+        if last_empty is None:
+            idx += 1
+            continue
+
+        if idx - last_empty >= consecutive:
+            for tbl in tablelist:
+                tbl.data = tbl.data[:last_empty] + [[-1] * len(tbl.data[0])] + tbl.data[idx:]
+                if tbl.has_labels():
+                    labels = tbl.row_labels
+                    if isinstance(labels, dict):
+                        for i in range(last_empty, idx):
+                            if i in labels:
+                                del labels[i]
+                        tbl.row_labels = labels
+                    else:
+                        tbl.row_labels = labels[:last_empty] + [''] + labels[idx:]
+            row_count = max(map(lambda x: len(x.data), tablelist))
+            idx -= idx - last_empty - 1
+        last_empty = None
+        idx += 1
 
 def draw_cell_bordered(val):
     yield '+--+'
@@ -61,6 +137,8 @@ def draw_cell_unborder(val):
     yield val
 
 def getval(tbl, val, col=-1, row=-1):
+    if val == -1:
+        return '**'
     if val == 0:
         if tbl.config['color']:
             return '\x1b[100m  \x1b[49m'

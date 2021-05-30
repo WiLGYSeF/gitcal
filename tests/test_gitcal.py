@@ -177,6 +177,27 @@ class GitcalTest(unittest.TestCase):
             '--exclude', 'long default user'
         ])
 
+    def test_draw_tables_all_users_collapse(self):
+        self.assert_draw_tables('git-log-multi-t', [
+            '-B',
+            '--all-users',
+            '--collapse', '3'
+        ])
+
+    def test_draw_tables_all_users_collapse_border(self):
+        self.assert_draw_tables('git-log-multi-t', [
+            '--all-users',
+            '--collapse', '3'
+        ])
+
+    def test_draw_tables_collapse_end(self):
+        self.assert_draw_tables('git-log-multi-t', [
+            '-B',
+            '--collapse', '1',
+            '--end', '2021-06-01',
+            '-f', 'jsmith'
+        ])
+
     def test_draw_cell_bordered(self):
         for i in range(5):
             val = 'a' * i

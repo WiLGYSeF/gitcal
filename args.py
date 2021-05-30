@@ -75,6 +75,9 @@ def table_config_from_namespace(namespace):
     filter_names = namespace.filter
     namespace.filter = []
 
+    collapse_flag = namespace.collapse_flag
+    namespace.collapse_flag = 0
+
     return {
         'tbl_name': tbl_name,
         'color': namespace.color,
@@ -84,6 +87,9 @@ def table_config_from_namespace(namespace):
         'filter_names': filter_names,
         'start': start,
         'end': end,
+
+        'collapse': namespace.collapse,
+        'collapse_flag': collapse_flag,
 
         'label_left': namespace.label_left,
         'label_sep': namespace.label_sep,
@@ -181,7 +187,9 @@ def append_all_users_table(namespace, table_configs):
         del user_dict[user]
     user_dict.update(merge_dict)
 
-    for name in sorted(user_dict):
+    user_names = sorted(user_dict)
+    for i in range(len(user_names)): #pylint: disable=consider-using-enumerate
+        name = user_names[i]
         user = user_dict[name]
         namespace.tbl_name = name
         namespace.filter = user['filter']
@@ -191,9 +199,13 @@ def append_all_users_table(namespace, table_configs):
         namespace.label_left = True
         do_label = False
 
-        table_configs.append(
-            table_config_from_namespace(namespace)
-        )
+        cfg = table_config_from_namespace(namespace)
+
+        if i == 0:
+            cfg['collapse_flag'] = 1
+        elif i == len(user_dict) - 1:
+            cfg['collapse_flag'] = -1
+        table_configs.append(cfg)
 
     namespace.merge = []
 
@@ -270,6 +282,20 @@ def parse_args(argv):
     group.add_argument('--all-users',
         action='store_true', default=False,
         help='create labelled tables for all usernames'
+    )
+    group.add_argument('--collapse',
+        action='store', type=int, metavar='NUM', default=-1,
+        help='collapse consecutive empty rows together if they exceed this count, use -1 to '
+        + 'disable (default -1)'
+    )
+    group.add_argument('--collapse-start',
+        dest='collapse_flag', action='store_const', const=1, default=0,
+        help='put the tables starting here to --collapse-end in a collapse group so consecutive'
+        + ' empty rows throughout the group are collapsed'
+    )
+    group.add_argument('--collapse-end',
+        dest='collapse_flag', action='store_const', const=-1,
+        help='see --collapse-start'
     )
 
     group = parser.add_argument_group('label options')

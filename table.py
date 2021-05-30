@@ -74,7 +74,9 @@ class Table:
 
                 if self.label_left:
                     padding = ' ' * (self.longest_label_length - len(label))
-                    padding_after = ' ' * (self.max_length() - self.longest_label_length - len(self.label_sep) - self.row_cell_length())
+                    padding_after = ' ' * (
+                        self.max_length() - self.longest_label_length - len(self.label_sep) - self.row_cell_length()
+                    )
 
                     if self.label_lpad:
                         label = padding + label
@@ -83,7 +85,9 @@ class Table:
 
                     chars = '%s%s%s%s' % (label, self.label_sep, chars, padding_after)
                 else:
-                    padding = ' ' * (self.max_length() - self.row_cell_length() - len(self.label_sep) - len(label))
+                    padding = ' ' * (
+                        self.max_length() - self.row_cell_length() - len(self.label_sep) - len(label)
+                    )
 
                     if self.label_lpad:
                         label = padding + label
@@ -218,8 +222,7 @@ class Table:
                                 row_counter[gidx] += 1
                                 lne_counter[gidx] = 0
 
-                                if tbl.cell_info.has_border \
-                                 and tbl.row_count() != row_counter[gidx]:
+                                if tbl.cell_info.has_border and tbl.row_count() != row_counter[gidx]:
                                     do_draw = True
                                     continue
                         except StopIteration:
