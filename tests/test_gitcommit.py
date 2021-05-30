@@ -73,7 +73,7 @@ class GitCommitTest(unittest.TestCase):
             with open(logfile, 'rb') as file:
                 return file.read()
 
-        with open(logfile + '.commits.output', 'r') as file:
+        with open(logfile + '.commits.txt', 'r') as file:
             with mock.patch('subprocess.check_output', get_data):
                 commits = gitcommit.get_commit_data()
             self.assertEqual(file.read().rstrip('\n'), str(commits))
