@@ -84,6 +84,7 @@ def table_config_from_namespace(namespace):
         'filter_names': filter_names,
         'start': start,
         'end': end,
+        'collapse': namespace.collapse,
 
         'label_left': namespace.label_left,
         'label_sep': namespace.label_sep,
@@ -266,6 +267,10 @@ def parse_args(argv):
     group.add_argument('--spacing',
         action='store', type=int, metavar='NUM', default=2,
         help='change the spacing between tables (default 2)'
+    )
+    group.add_argument('--collapse',
+        action='store', type=int, metavar='NUM', default=-1,
+        help='collapse consecutive empty rows together if they exceed this count, use -1 to disable (default -1)'
     )
     group.add_argument('--all-users',
         action='store_true', default=False,
