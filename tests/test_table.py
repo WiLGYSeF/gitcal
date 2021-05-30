@@ -166,13 +166,13 @@ class TableTest(unittest.TestCase):
             fname = os.path.join(TABLES_DIR, tblname + '.txt')
             tables.append(create_table_from_file(fname, border=True))
 
-        fname = os.path.join(TABLES_DIR, ','.join(names) + '.txt.border.output')
+        fname = os.path.join(TABLES_DIR, ','.join(names) + '.border.out.txt')
         self.assert_file(fname, tables, **kwargs)
 
         for tbl in tables:
             tbl.cell_info = cell_unborder
 
-        fname = os.path.join(TABLES_DIR, ','.join(names) + '.txt.output')
+        fname = os.path.join(TABLES_DIR, ','.join(names) + '.out.txt')
         self.assert_file(fname, tables, **kwargs)
 
     def assert_file(self, fname, tables, **kwargs):
