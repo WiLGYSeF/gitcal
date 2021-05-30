@@ -15,11 +15,12 @@ class ColAction(argparse.Action):
             return
 
         try:
-            col = int(val)
-            setattr(namespace, 'col', val)
-            return
+            int(val)
         except ValueError:
             pass
+        else:
+            setattr(namespace, 'col', val)
+            return
 
         raise ValueError('invalid column value: %s' % val)
 
@@ -60,18 +61,16 @@ def table_config_from_namespace(namespace):
     else:
         col = int(col)
 
-    start = None
-    if namespace.start is not None:
+    def convert_date(val):
+        if val is None:
+            return None
         try:
-            start = datetime.datetime.strptime(namespace.start, '%Y-%m-%d %H:%M:%S')
+            return datetime.datetime.strptime(val, '%Y-%m-%d %H:%M:%S')
         except ValueError:
-            start = datetime.datetime.strptime(namespace.start, '%Y-%m-%d')
-    end = None
-    if namespace.end is not None:
-        try:
-            end = datetime.datetime.strptime(namespace.end, '%Y-%m-%d %H:%M:%S')
-        except ValueError:
-            end = datetime.datetime.strptime(namespace.end, '%Y-%m-%d')
+            return datetime.datetime.strptime(val, '%Y-%m-%d')
+
+    start = convert_date(namespace.start)
+    end = convert_date(namespace.end)
 
     filter_names = namespace.filter
     namespace.filter = []
@@ -98,20 +97,20 @@ def table_config_from_namespace(namespace):
 
 def guess_col_count(delta, min_col=4, max_col=12):
     timeframes = [
-        60,
-        3600,
-        6 * 3600,
-        86400,
-        7 * 86400,
-        14 * 86400
+        60, # 1 minute
+        3600, # 1 hour
+        6 * 3600, # 6 hours
+        86400, # 1 day
+        7 * 86400, # 1 week
+        14 * 86400, # 2 weeks
     ]
 
     seconds = delta.days * 86400 + delta.seconds
     idx = 0
 
-    for i in range(len(timeframes)): #pylint: disable=consider-using-enumerate
+    for i in range(len(timeframes)):
         idx = i
-        if seconds < timeframes[i]:
+        if seconds < timeframes[idx]:
             break
 
     count = timeframes[idx] // seconds
@@ -253,11 +252,11 @@ def parse_args(argv):
     )
     group.add_argument('--start',
         action='store', metavar='DATE',
-        help='starts the table after date (%%Y-%%m-%%d %%H:%%M:%%S format)'
+        help='starts the table after date (%%Y-%%m-%%d or %%Y-%%m-%%d %%H:%%M:%%S format)'
     )
     group.add_argument('--end',
         action='store', metavar='DATE',
-        help='ends the table after date (%%Y-%%m-%%d %%H:%%M:%%S format)'
+        help='ends the table after date (%%Y-%%m-%%d or %%Y-%%m-%%d %%H:%%M:%%S format)'
     )
     group.add_argument('-T', '--table',
         action=TableAction, nargs=0,

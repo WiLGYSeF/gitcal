@@ -64,10 +64,7 @@ def getval(tbl, val, col=-1, row=-1):
     if val == 0:
         if tbl.config['color']:
             return '\x1b[100m  \x1b[49m'
-
-        if not tbl.cell_info.has_border:
-            return '..'
-        return '  '
+        return '  ' if tbl.cell_info.has_border else '..'
 
     celldata = '  '
     if tbl.config['num']:
@@ -76,7 +73,7 @@ def getval(tbl, val, col=-1, row=-1):
             celldata = '#^'
 
         if (
-            not tbl.cell_info.has_border \
+            not tbl.cell_info.has_border
             and tbl.config['color']
             and col != -1 and row != -1 and (col & 1) == 1
         ):
@@ -84,9 +81,7 @@ def getval(tbl, val, col=-1, row=-1):
                 celldata = '\x1b[4m%s\x1b[24m' % celldata
 
     if not tbl.config['color']:
-        if tbl.config['num']:
-            return celldata
-        return '##'
+        return celldata if tbl.config['num'] else '##'
 
     if val < tbl.config['threshold']:
         return '\x1b[30;43m%s\x1b[39;49m' % celldata
@@ -102,7 +97,6 @@ def is_val_touching_adjacent(tbl, val, col, row):
 def draw_tables_from_args(argv):
     argspace, table_configs = args.parse_args(argv)
     args.append_table_config(argspace, table_configs)
-
     return draw_tables(argspace, table_configs)
 
 if __name__ == '__main__': #pragma: no cover
