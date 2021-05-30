@@ -234,11 +234,11 @@ def parse_args(argv):
         help='do not display the table in color'
     )
     group.add_argument('-b', '--border',
-        action='store_true', default=True,
+        action='store_true', default=False,
         help='removes the cell borders from the output (default)'
     )
     group.add_argument('-B', '--no-border',
-        dest='border', action='store_false', default=False,
+        dest='border', action='store_false',
         help='removes the cell borders from the output'
     )
     group.add_argument('-c', '--col',

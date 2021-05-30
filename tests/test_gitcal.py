@@ -12,17 +12,35 @@ class GitcalTest(unittest.TestCase):
     def test_draw_tables(self):
         self.assert_draw_tables('git-log', [])
 
+    def test_draw_tables_border(self):
+        self.assert_draw_tables('git-log', ['-b'])
+
     def test_draw_tables_two(self):
         self.assert_draw_tables('git-log', ['--table'])
+
+    def test_draw_tables_two_border(self):
+        self.assert_draw_tables('git-log', ['-b', '--table'])
 
     def test_draw_tables_name(self):
         self.assert_draw_tables('git-log', ['--tbl-name', 'here is a name'])
 
+    def test_draw_tables_name_border(self):
+        self.assert_draw_tables('git-log', ['-b', '--tbl-name', 'here is a name'])
+
     def test_draw_tables_one_name(self):
         self.assert_draw_tables('git-log', ['--tbl-name', 'master', '-T'])
 
+    def test_draw_tables_one_name_border(self):
+        self.assert_draw_tables('git-log', ['-b', '--tbl-name', 'master', '-T'])
+
     def test_draw_tables_name_long(self):
         self.assert_draw_tables('git-log', [
+            '--tbl-name', 'here is a much longer name that is longer than the table'
+        ])
+
+    def test_draw_tables_name_long_border(self):
+        self.assert_draw_tables('git-log', [
+            '-b',
             '--tbl-name', 'here is a much longer name that is longer than the table'
         ])
 
@@ -32,11 +50,15 @@ class GitcalTest(unittest.TestCase):
             '--table'
         ])
 
-    def test_draw_tables_no_border(self):
-        self.assert_draw_tables('git-log', ['-B'])
+    def test_draw_tables_name_long_two_border(self):
+        self.assert_draw_tables('git-log', [
+            '-b',
+            '--tbl-name', 'here is a much longer name that is longer than the table',
+            '--table'
+        ])
 
     def test_draw_tables_no_color(self):
-        self.assert_draw_tables('git-log', ['--no-color'])
+        self.assert_draw_tables('git-log', ['-b', '--no-color'])
 
     def test_draw_tables_no_border_color(self):
         self.assert_draw_tables('git-log', ['-B', '--no-color'])
@@ -136,23 +158,23 @@ class GitcalTest(unittest.TestCase):
 
     def test_draw_tables_num(self):
         self.assert_draw_tables('git-log', ['--num'])
+        self.assert_draw_tables('git-log', ['--no-color', '--num'])
 
     def test_draw_tables_num_big(self):
         self.assert_draw_tables('git-log-big', ['--num'])
 
-    def test_draw_tables_num_no_border(self):
-        self.assert_draw_tables('git-log', ['-B', '--num'])
-        self.assert_draw_tables('git-log', ['-B', '--no-color', '--num'])
+    def test_draw_tables_num_border(self):
+        self.assert_draw_tables('git-log', ['-b', '--num'])
+        self.assert_draw_tables('git-log', ['-b', '--no-color', '--num'])
 
     def test_draw_tables_threshold(self):
         self.assert_draw_tables('git-log', ['-t', '4'])
 
     def test_draw_tables_all_users(self):
-        self.assert_draw_tables('git-log-multi-t', ['-B', '--no-label', '--all-users'])
+        self.assert_draw_tables('git-log-multi-t', ['--no-label', '--all-users'])
 
     def test_draw_tables_all_users_merge(self):
         self.assert_draw_tables('git-log-multi-t', [
-            '-B',
             '--no-label',
             '--all-users',
             '-m', 'Jonathan', 'John Smith', 'jsmith',
@@ -171,7 +193,6 @@ class GitcalTest(unittest.TestCase):
 
     def test_draw_tables_all_users_exclude(self):
         self.assert_draw_tables('git-log-multi-t', [
-            '-B',
             '--no-label',
             '--all-users',
             '--exclude', 'long default user'
@@ -179,20 +200,19 @@ class GitcalTest(unittest.TestCase):
 
     def test_draw_tables_all_users_collapse(self):
         self.assert_draw_tables('git-log-multi-t', [
-            '-B',
             '--all-users',
             '--collapse', '3'
         ])
 
     def test_draw_tables_all_users_collapse_border(self):
         self.assert_draw_tables('git-log-multi-t', [
+            '-b',
             '--all-users',
-            '--collapse', '3'
+            '--collapse', '4'
         ])
 
     def test_draw_tables_collapse_end(self):
         self.assert_draw_tables('git-log-multi-t', [
-            '-B',
             '--collapse', '1',
             '--end', '2021-06-01',
             '-f', 'jsmith'
@@ -230,7 +250,7 @@ class GitcalTest(unittest.TestCase):
                 print(name, args)
                 print(result)
 
-            outfname = '%s[%s].output' % (fname, ','.join(args))
+            outfname = '%s[%s].out.txt' % (fname, ','.join(args))
 
             if write_output: #pragma: nocover
                 with open(outfname, 'w') as file:
