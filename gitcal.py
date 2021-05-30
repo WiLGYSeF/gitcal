@@ -58,15 +58,19 @@ def do_collapses(tablelist):
     idx = 0
     while idx < len(tablelist):
         tbl = tablelist[idx]
-        if tbl.config['collapse'] > 0:
-            if tbl.config.get('all_users', False):
+        if tbl.config['collapse_flag'] == 1 or tbl.config['collapse'] > 0:
+            if tbl.config['collapse_flag'] == 1:
+                collapse = None
                 nxidx = idx + 1
                 while nxidx < len(tablelist):
                     next_tbl = tablelist[nxidx]
-                    if not next_tbl.config.get('all_users', False):
-                        break
                     nxidx += 1
-                collapse_tables(tablelist[idx:nxidx], tbl.config['collapse'])
+                    if collapse is None and next_tbl.config['collapse'] > 0:
+                        collapse = next_tbl.config['collapse']
+                    if next_tbl.config['collapse_flag'] == -1:
+                        break
+                if collapse is not None and collapse > 0:
+                    collapse_tables(tablelist[idx:nxidx], collapse)
                 idx = nxidx - 1
             else:
                 collapse_tables([tbl], tbl.config['collapse'])
@@ -82,9 +86,15 @@ def collapse_tables(tablelist, consecutive):
     last_empty = None
     idx = 0
 
-    row_count = min(map(lambda x: len(x.data), tablelist))
+    row_count = max(map(lambda x: len(x.data), tablelist))
 
     while idx < row_count:
+        new_tbls = []
+        for tbl in tablelist:
+            if idx < len(tbl.data):
+                new_tbls.append(tbl)
+        tablelist = new_tbls
+
         all_empty = True
         for tbl in tablelist:
             if not empty(tbl.data[idx]):
@@ -113,7 +123,7 @@ def collapse_tables(tablelist, consecutive):
                         tbl.row_labels = labels
                     else:
                         tbl.row_labels = labels[:last_empty] + [''] + labels[idx:]
-            row_count = min(map(lambda x: len(x.data), tablelist))
+            row_count = max(map(lambda x: len(x.data), tablelist))
             idx -= idx - last_empty - 1
         last_empty = None
         idx += 1
