@@ -279,6 +279,10 @@ def parse_args(argv):
         action='store', type=int, metavar='NUM', default=2,
         help='change the spacing between tables (default 2)'
     )
+    group.add_argument('--all-users',
+        action='store_true', default=False,
+        help='create labelled tables for all usernames'
+    )
     group.add_argument('--collapse',
         action='store', type=int, metavar='NUM', default=-1,
         help='collapse consecutive empty rows together if they exceed this count, use -1 to '
@@ -292,10 +296,6 @@ def parse_args(argv):
     group.add_argument('--collapse-end',
         dest='collapse_flag', action='store_const', const=-1,
         help='see --collapse-start'
-    )
-    group.add_argument('--all-users',
-        action='store_true', default=False,
-        help='create labelled tables for all usernames'
     )
 
     group = parser.add_argument_group('label options')
