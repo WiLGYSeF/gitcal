@@ -160,7 +160,7 @@ def append_all_users_table(namespace, table_configs):
     user_dict = {}
     for user in users:
         user_dict[user] = {
-            'filter': [ user ]
+            'filter': [user]
         }
 
     merge_dict = {}
@@ -235,11 +235,11 @@ def parse_args(argv):
     )
     group.add_argument('-b', '--border',
         action='store_true', default=False,
-        help='removes the cell borders from the output (default)'
+        help='add cell borders to the output'
     )
     group.add_argument('-B', '--no-border',
         dest='border', action='store_false',
-        help='removes the cell borders from the output'
+        help='removes the cell borders from the output (default)'
     )
     group.add_argument('-c', '--col',
         action=ColAction, metavar='NUM', default=None,

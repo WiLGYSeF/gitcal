@@ -61,7 +61,7 @@ class GitcalTest(unittest.TestCase):
         self.assert_draw_tables('git-log', ['-b', '--no-color'])
 
     def test_draw_tables_no_border_color(self):
-        self.assert_draw_tables('git-log', ['-B', '--no-color'])
+        self.assert_draw_tables('git-log', ['--no-color'])
 
     def test_draw_tables_col(self):
         self.assert_draw_tables('git-log', ['-c', '4'])
@@ -237,7 +237,7 @@ class GitcalTest(unittest.TestCase):
             self.assertRaises(StopIteration, next, gen)
 
     def assert_draw_tables(self, name, args, print_output=False, write_output=False):
-        fname = os.path.join(LOG_DIR, name + '.txt')
+        fname = os.path.join(LOG_DIR, sanitize_filename(name) + '.txt')
 
         def get_data(args):
             with open(fname, 'rb') as file:
@@ -250,7 +250,7 @@ class GitcalTest(unittest.TestCase):
                 print(name, args)
                 print(result)
 
-            outfname = '%s[%s].out.txt' % (fname, ','.join(args))
+            outfname = '%s[%s].out.txt' % (fname, sanitize_filename(','.join(args)))
 
             if write_output: #pragma: nocover
                 with open(outfname, 'w') as file:
@@ -267,3 +267,19 @@ class GitcalTest(unittest.TestCase):
 
         for i in range(len(alines)): #pylint: disable=consider-using-enumerate
             self.assertEqual(alines[i].rstrip(), blines[i].rstrip())
+
+def sanitize_filename(fname):
+    repl = {
+        '<': '_',
+        '>': '_',
+        ':': '_',
+        '"': '_',
+        '/': '_',
+        '\\': '_',
+        '|': '_',
+        '?': '_',
+        '*': '_',
+    }
+    for key, val in repl.items():
+        fname = fname.replace(key, val)
+    return fname
