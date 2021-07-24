@@ -60,7 +60,7 @@ def do_collapses(tablelist):
         tbl = tablelist[idx]
         if tbl.config['collapse_flag'] == 1 or tbl.config['collapse'] > 0:
             if tbl.config['collapse_flag'] == 1:
-                collapse = None
+                collapse = tbl.config['collapse'] if tbl.config['collapse'] > 0 else None
                 nxidx = idx + 1
                 while nxidx < len(tablelist):
                     next_tbl = tablelist[nxidx]
