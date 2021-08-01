@@ -1,10 +1,5 @@
-#!/usr/bin/env python3
-
-import sys
-
-import args
-from table import Table, CellInfo
-from gitcommit import create_table_from_commits, get_commit_data
+from gitcal.table import Table, CellInfo
+from gitcal.gitcommit import create_table_from_commits, get_commit_data
 
 
 def draw_tables(argspace, table_configs):
@@ -171,11 +166,3 @@ def is_val_touching_adjacent(tbl, val, col, row):
     ) or (
         col < len(tbl.data[row]) - 1 and tbl.data[row][col + 1] > 9
     )
-
-def draw_tables_from_args(argv):
-    argspace, table_configs = args.parse_args(argv)
-    args.append_table_config(argspace, table_configs)
-    return draw_tables(argspace, table_configs)
-
-if __name__ == '__main__': #pragma: no cover
-    print(draw_tables_from_args(sys.argv[1:]))

@@ -3,7 +3,7 @@ import os
 import unittest
 import unittest.mock as mock
 
-import gitcommit
+from gitcal import gitcommit
 
 
 def mkdtime(string):

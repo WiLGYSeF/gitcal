@@ -1,7 +1,7 @@
 import datetime
 import unittest
 
-import args
+from gitcal import args
 
 
 DELTA = 'delta'
