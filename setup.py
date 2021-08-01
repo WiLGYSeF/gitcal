@@ -4,7 +4,7 @@ with open('README.md', 'r', encoding='utf-8') as file:
     long_description = file.read()
 
 setuptools.setup(
-    name='gitcal-wilgysef',
+    name='gitcal',
     version='0.0.1',
     author='wilgysef',
     author_email='wilgysef@gmail.com',
