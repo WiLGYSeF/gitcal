@@ -2,7 +2,7 @@ import os
 import re
 import unittest
 
-from table import Table, CellInfo
+from src.gitcal.table import Table, CellInfo
 
 
 TABLES_DIR = os.path.join(os.path.dirname(__file__), 'tables')

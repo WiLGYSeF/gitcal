@@ -2,7 +2,7 @@ import os
 import unittest
 import unittest.mock as mock
 
-import gitcal
+from src.gitcal import gitcal, __main__
 
 
 LOG_DIR = os.path.join(os.path.dirname(__file__), 'mocked_data')
@@ -244,7 +244,7 @@ class GitcalTest(unittest.TestCase):
                 return file.read()
 
         with mock.patch('subprocess.check_output', get_data):
-            result = gitcal.draw_tables_from_args(args)
+            result = __main__.draw_tables_from_args(args)
 
             if print_output: #pragma: nocover
                 print(name, args)
