@@ -8,19 +8,19 @@ A python script to visualize when git commits were made in a repository in a cal
 
 Display the number of commits in 2 hour blocks in 12 columns. A block with at least 4 commits is colored in green:
 
-![sample gitcal usage](https://github.com/WiLGYSeF/gitcal/docs/images/sample-gitcal.png)
+![sample gitcal usage](https://github.com/WiLGYSeF/gitcal/blob/master/docs/images/sample-gitcal.png)
 
 ---
 
 An example of displaying two tables side-by-side, one with a border and different date range:
 
-![sample gitcal usage](https://github.com/WiLGYSeF/gitcal/docs/images/sample-gitcal-table-mix.png)
+![sample gitcal usage](https://github.com/WiLGYSeF/gitcal/blob/master/docs/images/sample-gitcal-table-mix.png)
 
 ---
 
 Compare commits with other members of a collaborative project:
 
-![sample gitcal usage](https://github.com/WiLGYSeF/gitcal/docs/images/sample-gitcal-all-users.png)
+![sample gitcal usage](https://github.com/WiLGYSeF/gitcal/blob/master/docs/images/sample-gitcal-all-users.png)
 
 # Installation
 
@@ -41,7 +41,7 @@ gitcal -T -n "My Commits" --num --no-label -f "<my username>" -t 4 -T -n "Partne
 
 A sample result of the above command (below describes each table):
 
-![sample gitcal usage](https://github.com/WiLGYSeF/gitcal/docs/images/sample-gitcal-multiple-tables.png)
+![sample gitcal usage](https://github.com/WiLGYSeF/gitcal/blob/master/docs/images/sample-gitcal-multiple-tables.png)
 
 ### Table 1
 
