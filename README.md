@@ -1,4 +1,5 @@
 # Gitcal
+
 [![Build Status](https://www.travis-ci.com/WiLGYSeF/gitcal.svg?branch=master)](https://www.travis-ci.com/WiLGYSeF/gitcal)
 [![codecov](https://codecov.io/gh/WiLGYSeF/gitcal/branch/master/graph/badge.svg?token=R4FFV0ZCGB)](https://codecov.io/gh/WiLGYSeF/gitcal)
 
@@ -24,8 +25,9 @@ Compare commits with other members of a collaborative project:
 
 # Installation
 
-1. Clone this repository and place somewhere like `~/.local/bin/gitcal-py`
-2. Create a symlink from `~/.local/bin/gitcal-py/gitcal.py` to `~/.local/bin/gitcal`
+```bash
+pip install gitcal
+```
 
 # Displaying Multiple tables
 
