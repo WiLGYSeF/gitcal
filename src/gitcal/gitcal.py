@@ -1,5 +1,5 @@
-from gitcal.table import Table, CellInfo
-from gitcal.gitcommit import create_table_from_commits, get_commit_data
+from .table import Table, CellInfo
+from .gitcommit import create_table_from_commits, get_commit_data
 
 
 def draw_tables(argspace, table_configs):

@@ -1,7 +1,7 @@
 import datetime
 import subprocess
 
-from gitcal.table import Table
+from .table import Table
 
 
 def create_table_from_commits(cell_info, commits, **kwargs):

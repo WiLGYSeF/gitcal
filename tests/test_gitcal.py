@@ -2,7 +2,7 @@ import os
 import unittest
 import unittest.mock as mock
 
-from gitcal import gitcal, __main__
+from src.gitcal import gitcal, __main__
 
 
 LOG_DIR = os.path.join(os.path.dirname(__file__), 'mocked_data')

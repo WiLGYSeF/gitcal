@@ -1,7 +1,8 @@
 import sys
 
-from gitcal import args
-from gitcal import gitcal
+from . import args
+from . import gitcal
+
 
 def main():
     print(draw_tables_from_args(sys.argv[1:]))

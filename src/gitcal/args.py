@@ -3,7 +3,7 @@ import datetime
 import re
 import sys
 
-from gitcal import gitcommit
+from . import gitcommit
 
 
 class ColAction(argparse.Action):
