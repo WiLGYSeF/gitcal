@@ -73,13 +73,13 @@ def do_collapses(tablelist: typing.List[Table]) -> None:
         idx += 1
 
 def collapse_tables(tablelist: typing.List[Table], consecutive: int) -> None:
-    def empty(row) -> bool:
+    def empty(row: typing.List[int]) -> bool:
         for val in row:
             if val != 0:
                 return False
         return True
 
-    last_empty = None
+    last_empty: typing.Optional[int] = None
     idx = 0
 
     row_count = max(map(lambda x: len(x.data), tablelist))
