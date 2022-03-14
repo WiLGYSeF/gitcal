@@ -90,5 +90,5 @@ class GitCommitTest(unittest.TestCase):
                 return file.read()
 
         with mock.patch('subprocess.check_output', get_data):
-            users = gitcommit.get_users_from_commits()
+            users = gitcommit.get_users_from_commits(gitcommit.get_commit_data())
         self.assertEqual(users, set(['WiLGYSeF', 'aaasdf']))
