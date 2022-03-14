@@ -1,12 +1,14 @@
 import argparse
-import datetime
+from argparse import Action, Namespace
+from datetime import datetime, timedelta
 import re
 import sys
+import typing
 
 from . import gitcommit
+from .tableconfig import TableConfig
 
-
-class ColAction(argparse.Action):
+class ColAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         val = values
 
@@ -24,34 +26,34 @@ class ColAction(argparse.Action):
 
         raise ValueError('invalid column value: %s' % val)
 
-class DeltaAction(argparse.Action):
+class DeltaAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         val = values
 
         match = re.fullmatch(r'([0-9]+) *m(?:in(?:utes?)?)?', val)
         if match is not None:
-            setattr(namespace, 'delta', datetime.timedelta(minutes=int(match[1])))
+            setattr(namespace, 'delta', timedelta(minutes=int(match[1])))
             return
 
         match = re.fullmatch(r'([0-9]+) *h(?:(?:ou)?rs?)?', val)
         if match is not None:
-            setattr(namespace, 'delta', datetime.timedelta(hours=int(match[1])))
+            setattr(namespace, 'delta', timedelta(hours=int(match[1])))
             return
 
         match = re.fullmatch(r'([0-9]+)(?: *d(?:ays?)?)?', val)
         if match is not None:
-            setattr(namespace, 'delta', datetime.timedelta(days=int(match[1])))
+            setattr(namespace, 'delta', timedelta(days=int(match[1])))
             return
 
         raise ValueError('unknown delta value: %s' % val)
 
-def table_config_from_namespace(namespace):
+def table_config_from_namespace(namespace: Namespace) -> TableConfig:
     tbl_name = namespace.tbl_name
     namespace.tbl_name = None
 
     delta = getattr(namespace, 'delta', None)
     if delta is None:
-        delta = datetime.timedelta(days=1)
+        delta = timedelta(days=1)
 
     col = namespace.col
     if col is None or col.lower() == 'guess':
@@ -65,9 +67,9 @@ def table_config_from_namespace(namespace):
         if val is None:
             return None
         try:
-            return datetime.datetime.strptime(val, '%Y-%m-%d %H:%M:%S')
+            return datetime.strptime(val, '%Y-%m-%d %H:%M:%S')
         except ValueError:
-            return datetime.datetime.strptime(val, '%Y-%m-%d')
+            return datetime.strptime(val, '%Y-%m-%d')
 
     start = convert_date(namespace.start)
     end = convert_date(namespace.end)
@@ -78,30 +80,30 @@ def table_config_from_namespace(namespace):
     collapse_flag = namespace.collapse_flag
     namespace.collapse_flag = 0
 
-    return {
-        'tbl_name': tbl_name,
-        'color': namespace.color,
-        'border': namespace.border,
-        'col': col,
-        'delta': delta,
-        'filter_names': filter_names,
-        'start': start,
-        'end': end,
+    return TableConfig(
+        tbl_name=tbl_name,
+        color=namespace.color,
+        border=namespace.border,
+        col=col,
+        delta=delta,
+        filter_names=filter_names,
+        start=start,
+        end=end,
 
-        'collapse': namespace.collapse,
-        'collapse_flag': collapse_flag,
+        collapse=namespace.collapse,
+        collapse_flag=collapse_flag,
 
-        'label_left': namespace.label_left,
-        'label_sep': namespace.label_sep,
-        'label': namespace.label,
-        'label_inclusive': namespace.label_inclusive,
-        'long_label': namespace.long_label,
+        label_left=namespace.label_left,
+        label_sep=namespace.label_sep,
+        label=namespace.label,
+        label_inclusive=namespace.label_inclusive,
+        long_label=namespace.long_label,
 
-        'threshold': namespace.threshold,
-        'num': namespace.num,
-    }
+        threshold=namespace.threshold,
+        num=namespace.num,
+    )
 
-def guess_col_count(delta, min_col=4, max_col=12):
+def guess_col_count(delta: timedelta, min_col: int = 4, max_col: int = 12):
     timeframes = [
         60, # 1 minute
         3600, # 1 hour
@@ -135,14 +137,14 @@ def guess_col_count(delta, min_col=4, max_col=12):
         checked.add(idx)
     return count
 
-def append_table_config(namespace, table_configs):
+def append_table_config(namespace: Namespace, table_configs: typing.List[TableConfig]):
     if namespace.all_users:
         append_all_users_table(namespace, table_configs)
         namespace.all_users = False
     else:
         table_configs.append(table_config_from_namespace(namespace))
 
-def append_all_users_table(namespace, table_configs):
+def append_all_users_table(namespace: Namespace, table_configs: typing.List[TableConfig]):
     commits = gitcommit.get_commit_data()
     users = gitcommit.get_users_from_commits(commits)
     do_label = namespace.label
@@ -155,7 +157,7 @@ def append_all_users_table(namespace, table_configs):
 
     last_date = namespace.end
     if last_date is None:
-        last_date = commits[0]['datetime'].strftime('%Y-%m-%d %H:%M:%S')
+        last_date = commits[0].datetime.strftime('%Y-%m-%d %H:%M:%S')
 
     user_dict = {}
     for user in users:
@@ -188,7 +190,7 @@ def append_all_users_table(namespace, table_configs):
     user_dict.update(merge_dict)
 
     user_names = sorted(user_dict)
-    for i in range(len(user_names)): #pylint: disable=consider-using-enumerate
+    for i in range(len(user_names)): # pylint: disable=consider-using-enumerate
         name = user_names[i]
         user = user_dict[name]
         namespace.tbl_name = name
@@ -202,22 +204,27 @@ def append_all_users_table(namespace, table_configs):
         cfg = table_config_from_namespace(namespace)
 
         if i == 0:
-            cfg['collapse_flag'] = 1
+            cfg.collapse_flag = 1
         elif i == len(user_dict) - 1:
-            cfg['collapse_flag'] = -1
+            cfg.collapse_flag = -1
         table_configs.append(cfg)
 
     namespace.merge = []
 
-def parse_args(argv):
-    table_configs = []
+def parse_args(argv) -> typing.Tuple[Namespace, typing.List[TableConfig]]:
+    table_configs: typing.List[TableConfig] = []
 
-    class TableAction(argparse.Action):
+    class TableAction(Action):
         def __call__(self, parser, namespace, values, option_string=None):
             append_table_config(namespace, table_configs)
 
     parser = argparse.ArgumentParser(
         description='Show git commits in a visual calendar-like format'
+    )
+
+    parser.add_argument('-V', '--version',
+        action='store_true', default=False,
+        help='show the version number and exit'
     )
 
     group = parser.add_argument_group('table options')

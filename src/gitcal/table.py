@@ -1,23 +1,52 @@
+import typing
+
+from .tableconfig import TableConfig
+
+class CellInfo:
+    def __init__(self, **kwargs):
+        self.width: int = kwargs['width']
+        self.height: int = kwargs['height']
+        self.has_border: bool = kwargs['has_border']
+
+        self.fnc_draw_cell: typing.Callable[
+            [int],
+            typing.Generator[str, None, None]
+        ] = kwargs['drawcell']
+        self.fnc_getval: typing.Callable[
+            [Table, int, int, int],
+            str
+        ] = kwargs.get('getval', lambda t, v, c, r: v)
+
 class Table:
-    def __init__(self, cell_info):
-        self.data = [[]]
-        self.cell_info = cell_info
+    def __init__(self, cell_info: CellInfo):
+        self.data: typing.List[typing.List[int]] = [[]]
+        self.cell_info: CellInfo = cell_info
 
-        self.table_name = None
+        self.table_name: typing.Optional[str] = None
 
-        self.label_sep = '  '
-        self.label_lpad = False
-        self.label_left = False
+        self.label_sep: str = '  '
+        self.label_lpad: bool = False
+        self.label_left: bool = False
 
-        self._row_labels = {}
-        self._longest_label_length = 0
+        self._row_labels: typing.Union[
+            typing.List[str],
+            typing.Dict[int, str]
+        ] = {}
+        self._longest_label_length: int = 0
+
+        self.config: TableConfig = TableConfig()
 
     @property
     def row_labels(self):
         return self._row_labels
 
     @row_labels.setter
-    def row_labels(self, value):
+    def row_labels(self,
+            value: typing.Union[
+                typing.List[str],
+                typing.Dict[int, str]
+            ]
+        ):
         self._row_labels = value
         self._longest_label_length = self._get_longest_label_length()
 
@@ -25,20 +54,20 @@ class Table:
     def longest_label_length(self):
         return self._longest_label_length
 
-    def draw_table(self):
-        return Table.draw_tables( (self,) )
+    def draw_table(self) -> str:
+        return Table.draw_tables([self])
 
-    def draw_table_iter(self):
+    def draw_table_iter(self) -> typing.Generator[str, None, None]:
         row_idx = 0
         for row in self.data:
             for char_row in self.draw_row_iter(row, row_idx):
                 yield char_row
             row_idx += 1
 
-    def draw_row(self, row, row_idx=-1):
+    def draw_row(self, row: typing.List[int], row_idx: int = -1) -> str:
         return '\n'.join(self.draw_row_iter(row, row_idx))
 
-    def draw_row_iter(self, row, row_idx=-1):
+    def draw_row_iter(self, row: typing.List[int], row_idx: int = -1):
         gen_list = [ self.draw_cell_iter(row[i], col=i, row=row_idx) for i in range(len(row)) ]
         if len(gen_list) == 0:
             return
@@ -101,7 +130,7 @@ class Table:
             yield chars
             first_line = False
 
-    def draw_cell_iter(self, val, col=-1, row=-1):
+    def draw_cell_iter(self, val: int, col: int = -1, row: int = -1) -> typing.Generator[str, None, None]:
         for res in self.cell_info.fnc_draw_cell(
             self.cell_info.fnc_getval(
                 self,
@@ -112,7 +141,7 @@ class Table:
         ):
             yield res
 
-    def get_row_label(self, row_idx):
+    def get_row_label(self, row_idx: int) -> typing.Optional[str]:
         if isinstance(self.row_labels, dict):
             return self.row_labels.get(row_idx)
 
@@ -120,7 +149,7 @@ class Table:
             return None
         return self.row_labels[row_idx]
 
-    def max_length(self, include_table_name=True, include_label=True):
+    def max_length(self, include_table_name: bool = True, include_label: bool = True) -> int:
         length = self.row_cell_length()
         name_longer = include_table_name and self.table_name is not None and len(self.table_name) > length
 
@@ -139,7 +168,7 @@ class Table:
                     length += len(self.label_sep) + self.longest_label_length
         return length
 
-    def _get_longest_label_length(self):
+    def _get_longest_label_length(self) -> int:
         val_list = self.row_labels
         if isinstance(self.row_labels, dict):
             val_list = self.row_labels.values()
@@ -150,25 +179,25 @@ class Table:
                 length = len(val)
         return length
 
-    def has_labels(self):
+    def has_labels(self) -> bool:
         return len(self.row_labels) != 0
 
-    def row_cell_length(self):
+    def row_cell_length(self) -> int:
         length = self.col_count() * self.cell_info.width
         if self.cell_info.has_border:
             length -= self.col_count() - 1
         return length
 
-    def row_count(self):
+    def row_count(self) -> int:
         return len(self.data)
 
-    def col_count(self):
+    def col_count(self) -> int:
         if self.row_count() == 0:
             return 0
         return len(self.data[0])
 
     @staticmethod
-    def draw_tables(tablelist, **kwargs):
+    def draw_tables(tablelist: typing.List['Table'], **kwargs) -> str:
         tbl_count = len(tablelist)
         spacing = kwargs.get('spacing', 2)
         row_counter = [ 0 ] * tbl_count
@@ -177,7 +206,7 @@ class Table:
         last_result_len = 0
 
         gen_list = []
-        gen_done = set()
+        gen_done: typing.Set[int] = set()
         has_table_name = False
 
         for tbl in tablelist:
@@ -246,12 +275,3 @@ class Table:
             last_result_len = len(result)
 
         return result
-
-class CellInfo:
-    def __init__(self, **kwargs):
-        self.width = kwargs['width']
-        self.height = kwargs['height']
-        self.has_border = kwargs['has_border']
-
-        self.fnc_draw_cell = kwargs['drawcell']
-        self.fnc_getval = kwargs.get('getval', lambda x: x)
