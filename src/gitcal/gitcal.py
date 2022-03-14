@@ -1,9 +1,11 @@
+from argparse import Namespace
 import typing
 
 from .table import Table, CellInfo
+from .tableconfig import TableConfig
 from .gitcommit import create_table_from_commits, get_commit_data
 
-def draw_tables(argspace, table_configs) -> str:
+def draw_tables(argspace: Namespace, table_configs: typing.List[TableConfig]) -> str:
     cell_bordered = CellInfo(
         width=4,
         height=3,
@@ -157,9 +159,8 @@ def getval(tbl: Table, val: int, col: int = -1, row: int = -1) -> str:
     if not tbl.config.color:
         return celldata if tbl.config.num else '##'
 
-    if val < tbl.config.threshold:
-        return '\x1b[30;43m%s\x1b[39;49m' % celldata
-    return '\x1b[30;42m%s\x1b[39;49m' % celldata
+    color = '\x1b[30;43m' if val < tbl.config.threshold else '\x1b[30;42m'
+    return '%s%s\x1b[39;49m' % (color, celldata)
 
 def is_val_touching_adjacent(tbl: Table, val: int, col: int, row: int) -> bool:
     return (

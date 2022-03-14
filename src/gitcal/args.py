@@ -51,7 +51,7 @@ def table_config_from_namespace(namespace: Namespace) -> TableConfig:
     tbl_name = namespace.tbl_name
     namespace.tbl_name = None
 
-    delta = getattr(namespace, 'delta', None)
+    delta = getattr(namespace, 'delta')
     if delta is None:
         delta = timedelta(days=1)
 
@@ -63,7 +63,7 @@ def table_config_from_namespace(namespace: Namespace) -> TableConfig:
     else:
         col = int(col)
 
-    def convert_date(val):
+    def convert_date(val: str) -> typing.Optional[datetime]:
         if val is None:
             return None
         try:

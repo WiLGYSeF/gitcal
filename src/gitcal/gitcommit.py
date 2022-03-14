@@ -27,11 +27,9 @@ def create_table_from_commits(cell_info: CellInfo, commits: typing.List[Commit],
     start_date: typing.Optional[datetime] = kwargs.get('start_date')
     end_date: typing.Optional[datetime] = kwargs.get('end_date')
 
-    filter_names: typing.Union[typing.List[str], str, None] = kwargs.get('filter_names')
+    filter_names: typing.Optional[typing.List[str]] = kwargs.get('filter_names')
     if filter_names is None:
         filter_names = []
-    if not isinstance(filter_names, list):
-        filter_names = [ filter_names ]
 
     tbl = Table(cell_info)
 
@@ -160,10 +158,7 @@ def get_commit_data() -> typing.List[Commit]:
     ])
     commits: typing.List[Commit] = []
 
-    for line in map(lambda x: x.decode('utf-8'), output.split(b'\n')):
-        if len(line) == 0:
-            continue
-
+    for line in filter(lambda x: len(x) > 0, map(lambda x: x.decode('utf-8'), output.split(b'\n'))):
         spl = line.split(' ')
         shorthash = spl[0]
         dtime = datetime.strptime(spl[1], '%Y%m%d%H%M%S')
@@ -172,12 +167,5 @@ def get_commit_data() -> typing.List[Commit]:
         commits.append(Commit(shorthash, dtime, name))
     return commits
 
-def get_users_from_commits(commits: typing.List[Commit] = None) -> typing.Set[str]:
-    if commits is None:
-        commits = get_commit_data()
-
-    users = set()
-    for commit in commits:
-        users.add(commit.author_name)
-
-    return users
+def get_users_from_commits(commits: typing.List[Commit]) -> typing.Set[str]:
+    return set(map(lambda c: c.author_name, commits))
