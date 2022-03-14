@@ -1,4 +1,5 @@
 import argparse
+from argparse import Action, Namespace
 from datetime import datetime, timedelta
 import re
 import sys
@@ -7,7 +8,7 @@ import typing
 from . import gitcommit
 from .tableconfig import TableConfig
 
-class ColAction(argparse.Action):
+class ColAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         val = values
 
@@ -25,7 +26,7 @@ class ColAction(argparse.Action):
 
         raise ValueError('invalid column value: %s' % val)
 
-class DeltaAction(argparse.Action):
+class DeltaAction(Action):
     def __call__(self, parser, namespace, values, option_string=None):
         val = values
 
@@ -46,7 +47,7 @@ class DeltaAction(argparse.Action):
 
         raise ValueError('unknown delta value: %s' % val)
 
-def table_config_from_namespace(namespace: argparse.Namespace) -> TableConfig:
+def table_config_from_namespace(namespace: Namespace) -> TableConfig:
     tbl_name = namespace.tbl_name
     namespace.tbl_name = None
 
@@ -102,7 +103,7 @@ def table_config_from_namespace(namespace: argparse.Namespace) -> TableConfig:
         num=namespace.num,
     )
 
-def guess_col_count(delta, min_col=4, max_col=12):
+def guess_col_count(delta: timedelta, min_col: int = 4, max_col: int = 12):
     timeframes = [
         60, # 1 minute
         3600, # 1 hour
@@ -136,14 +137,14 @@ def guess_col_count(delta, min_col=4, max_col=12):
         checked.add(idx)
     return count
 
-def append_table_config(namespace, table_configs):
+def append_table_config(namespace: Namespace, table_configs: typing.List[TableConfig]):
     if namespace.all_users:
         append_all_users_table(namespace, table_configs)
         namespace.all_users = False
     else:
         table_configs.append(table_config_from_namespace(namespace))
 
-def append_all_users_table(namespace, table_configs):
+def append_all_users_table(namespace: Namespace, table_configs: typing.List[TableConfig]):
     commits = gitcommit.get_commit_data()
     users = gitcommit.get_users_from_commits(commits)
     do_label = namespace.label
@@ -210,10 +211,10 @@ def append_all_users_table(namespace, table_configs):
 
     namespace.merge = []
 
-def parse_args(argv) -> typing.Tuple[argparse.Namespace, typing.List[TableConfig]]:
-    table_configs = []
+def parse_args(argv) -> typing.Tuple[Namespace, typing.List[TableConfig]]:
+    table_configs: typing.List[TableConfig] = []
 
-    class TableAction(argparse.Action):
+    class TableAction(Action):
         def __call__(self, parser, namespace, values, option_string=None):
             append_table_config(namespace, table_configs)
 

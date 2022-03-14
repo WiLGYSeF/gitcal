@@ -5,12 +5,12 @@ import typing
 from .table import CellInfo, Table
 
 class Commit:
-    def __init__(self, shorthash: str, dtime: str, name: str):
+    def __init__(self, shorthash: str, dtime: datetime, name: str):
         self.shorthash: str = shorthash
         self.datetime: datetime = dtime
         self.author_name: str = name
 
-    def toJson(self) -> dict:
+    def json(self) -> dict:
         return {
             'shorthash': self.shorthash,
             'datetime': str(self.datetime),
@@ -160,8 +160,7 @@ def get_commit_data() -> typing.List[Commit]:
     ])
     commits: typing.List[Commit] = []
 
-    for line in output.split(b'\n'):
-        line = line.decode('utf-8')
+    for line in map(lambda x: x.decode('utf-8'), output.split(b'\n')):
         if len(line) == 0:
             continue
 

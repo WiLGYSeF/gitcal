@@ -79,7 +79,7 @@ class GitCommitTest(unittest.TestCase):
                 commits = gitcommit.get_commit_data()
             self.assertEqual(
                 file.read().rstrip('\n'),
-                json.dumps(list(map(lambda x: x.toJson(), commits)), indent=2)
+                json.dumps(list(map(lambda x: x.json(), commits)), indent=2)
             )
 
     def test_get_users_from_commits(self):

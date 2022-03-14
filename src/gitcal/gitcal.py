@@ -72,7 +72,7 @@ def do_collapses(tablelist: typing.List[Table]) -> None:
                 collapse_tables([tbl], tbl.config.collapse)
         idx += 1
 
-def collapse_tables(tablelist: typing.List[Table], consecutive: typing.Optional[int]) -> None:
+def collapse_tables(tablelist: typing.List[Table], consecutive: int) -> None:
     def empty(row) -> bool:
         for val in row:
             if val != 0:

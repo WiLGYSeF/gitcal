@@ -34,7 +34,7 @@ class Table:
         ] = {}
         self._longest_label_length: int = 0
 
-        self.config: typing.Optional[TableConfig] = None
+        self.config: TableConfig = TableConfig()
 
     @property
     def row_labels(self):
@@ -55,7 +55,7 @@ class Table:
         return self._longest_label_length
 
     def draw_table(self) -> str:
-        return Table.draw_tables( (self,) )
+        return Table.draw_tables([self])
 
     def draw_table_iter(self) -> typing.Generator[str, None, None]:
         row_idx = 0
@@ -64,10 +64,10 @@ class Table:
                 yield char_row
             row_idx += 1
 
-    def draw_row(self, row, row_idx: int = -1) -> str:
+    def draw_row(self, row: typing.List[int], row_idx: int = -1) -> str:
         return '\n'.join(self.draw_row_iter(row, row_idx))
 
-    def draw_row_iter(self, row, row_idx: int = -1):
+    def draw_row_iter(self, row: typing.List[int], row_idx: int = -1):
         gen_list = [ self.draw_cell_iter(row[i], col=i, row=row_idx) for i in range(len(row)) ]
         if len(gen_list) == 0:
             return
@@ -130,7 +130,7 @@ class Table:
             yield chars
             first_line = False
 
-    def draw_cell_iter(self, val: str, col: int = -1, row: int = -1) -> typing.Generator[str, None, None]:
+    def draw_cell_iter(self, val: int, col: int = -1, row: int = -1) -> typing.Generator[str, None, None]:
         for res in self.cell_info.fnc_draw_cell(
             self.cell_info.fnc_getval(
                 self,
@@ -141,7 +141,7 @@ class Table:
         ):
             yield res
 
-    def get_row_label(self, row_idx: int) -> str:
+    def get_row_label(self, row_idx: int) -> typing.Optional[str]:
         if isinstance(self.row_labels, dict):
             return self.row_labels.get(row_idx)
 
@@ -206,7 +206,7 @@ class Table:
         last_result_len = 0
 
         gen_list = []
-        gen_done = set()
+        gen_done: typing.Set[int] = set()
         has_table_name = False
 
         for tbl in tablelist:
