@@ -1,4 +1,5 @@
 import datetime
+import json
 import os
 import unittest
 import unittest.mock as mock
@@ -76,7 +77,10 @@ class GitCommitTest(unittest.TestCase):
         with open(logfile + '.commits.txt', 'r') as file:
             with mock.patch('subprocess.check_output', get_data):
                 commits = gitcommit.get_commit_data()
-            self.assertEqual(file.read().rstrip('\n'), str(commits))
+            self.assertEqual(
+                file.read().rstrip('\n'),
+                json.dumps(list(map(lambda x: x.toJson(), commits)), indent=2)
+            )
 
     def test_get_users_from_commits(self):
         logfile = os.path.join(LOG_DIR, 'git-log-multi.txt')
