@@ -5,7 +5,7 @@ with open('README.md', 'r', encoding='utf-8') as file:
 
 setuptools.setup(
     name='gitcal',
-    version='0.0.2',
+    version='0.0.3',
     author='wilgysef',
     author_email='wilgysef@gmail.com',
     description='Visualize when git commits were made in a repository in a calendar-like format.',
