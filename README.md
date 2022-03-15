@@ -29,7 +29,7 @@ Compare commits with other members of a collaborative project:
 pip install gitcal
 ```
 
-# Displaying Multiple tables
+# Displaying Multiple Tables
 
 gitcal uses the `-T/--table` argument to display multiple tables.
 A table is created based on the arguments on each side of `-T`, where the command below is used to create multiple tables:
